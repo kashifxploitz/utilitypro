@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Multi-Tool: PDF Converter & Image Processor</title>
+
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        background-color: #f8f9fa;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 0 20px;
+        width: 100%;
+      }
+
+      header {
+        background: #007bff;
+        color: #fff;
+        padding: 1.5rem 0;
+        text-align: center;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin-bottom: 0.5rem;
+        font-size: 2.5rem;
+      }
+
+      header p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+      }
+
+      main {
+        flex-grow: 1;
+        padding: 0 0 2rem 0;
+      }
+
+      .tool-section {
+        padding: 1rem 0;
+        margin-bottom: 2rem;
+      }
+
+      .tool-card {
+        background: #fff;
+        padding: 2rem;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 700px;
+        margin: 0 auto;
+      }
+
+      .tool-card h2 {
+        color: #007bff;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        border-bottom: 2px solid #e9ecef;
+        padding-bottom: 1rem;
+      }
+
+      .upload-area {
+        border: 2px dashed #007bff;
+        border-radius: 8px;
+        padding: 2rem 1.5rem;
+        margin-bottom: 1.5rem;
+        cursor: pointer;
+        transition: border-color 0.3s ease, background-color 0.3s ease;
+        background-color: #e9f7ff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .upload-area:hover {
+        border-color: #0056b3;
+        background-color: #cfe9ff;
+      }
+
+      .upload-button {
+        display: inline-flex;
+        align-items: center;
+        background-color: #007bff;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, opacity 0.3s ease;
+        font-size: 1rem;
+        font-weight: bold;
+        text-decoration: none;
+      }
+
+      .upload-button svg {
+        margin-left: 8px;
+      }
+
+      .upload-button:hover {
+        background-color: #0056b3;
+      }
+
+      .upload-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .file-info {
+        margin-top: 1rem;
+        font-size: 1rem;
+        color: #555;
+      }
+
+      .convert-button,
+      .process-button {
+        display: inline-block;
+        background-color: #28a745;
+        color: #fff;
+        padding: 0.75rem 2rem;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1.1rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease, opacity 0.3s ease;
+        margin-bottom: 1.5rem;
+      }
+
+      .convert-button:hover,
+      .process-button:hover {
+        background-color: #218838;
+      }
+
+      .convert-button:disabled,
+      .process-button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+
+      .status-message {
+        margin-top: 1rem;
+        font-size: 1rem;
+        color: #007bff;
+        min-height: 1.2rem;
+      }
+
+      .status-message.error {
+        color: #dc3545;
+      }
+
+      .download-area {
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #eee;
+      }
+
+      .download-area h3 {
+        color: #28a745;
+        margin-bottom: 1rem;
+      }
+
+      .download-button {
+        display: inline-flex;
+        align-items: center;
+        background-color: #007bff;
+        color: #fff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 5px;
+        text-decoration: none;
+        font-size: 1rem;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+      }
+
+      .download-button svg {
+        margin-left: 8px;
+      }
+
+      .download-button:hover {
+        background-color: #0056b3;
+      }
+
+      .info-box {
+        margin-top: 2rem;
+        padding: 1rem;
+        background-color: #e9ecef;
+        border-left: 4px solid #007bff;
+        border-radius: 4px;
+        text-align: left;
+        font-size: 0.9rem;
+        color: #555;
+      }
+
+      .info-box h4 {
+        color: #007bff;
+        margin-bottom: 0.8rem;
+      }
+
+      .info-box p {
+        margin-bottom: 0.5rem;
+      }
+
+      .backend-note {
+        font-weight: bold;
+        color: #dc3545;
+        margin-top: 1rem;
+      }
+
+      /* General Converter Options */
+      .converter-options {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        text-align: left;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem; /* Spacing between format selectors */
+      }
+
+      .converter-options .format-selector {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .converter-options label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #555;
+      }
+
+      .converter-options select {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+      }
+
+      /* Image Specific Styles */
+      #imagePreviewArea {
+        margin-top: 1.5rem;
+        margin-bottom: 1.5rem;
+        text-align: center;
+      }
+
+      #imagePreview {
+        max-width: 100%;
+        max-height: 300px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        display: none;
+        margin: 0 auto;
+      }
+
+      .image-options {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        text-align: left;
+        display: none;
+      }
+
+      .image-options label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: bold;
+        color: #555;
+      }
+
+      .image-options div {
+        margin-bottom: 1rem;
+      }
+
+      .image-options select,
+      .image-options input[type="range"] {
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        font-size: 1rem;
+        -webkit-appearance: none;
+        appearance: none;
+        background: #e9ecef;
+        outline: none;
+        opacity: 0.7;
+        transition: opacity 0.2s;
+      }
+
+      .image-options input[type="range"]:hover {
+        opacity: 1;
+      }
+
+      .image-options input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      .image-options input[type="range"]::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        background: #007bff;
+        cursor: pointer;
+        border-radius: 50%;
+        border: none;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      #qualityValue {
+        display: inline-block;
+        margin-left: 10px;
+        font-weight: normal;
+        color: #333;
+      }
+
+      footer {
+        background: #343a40;
+        color: #fff;
+        text-align: center;
+        padding: 1.5rem 0;
+        margin-top: auto;
+      }
+
+      footer p {
+        font-size: 0.9rem;
+      }
+
+      @media (max-width: 768px) {
+        header h1 {
+          font-size: 2rem;
+        }
+
+        header p {
+          font-size: 1rem;
+        }
+
+        .tool-card {
+          padding: 1.5rem;
+        }
+
+        .tool-card h2 {
+          font-size: 1.7rem;
+          margin-bottom: 1rem;
+        }
+
+        .upload-area {
+          padding: 1.5rem 1rem;
+        }
+
+        .upload-button {
+          padding: 0.6rem 1.2rem;
+          font-size: 0.95rem;
+        }
+
+        .upload-button svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .convert-button,
+        .process-button,
+        .download-button {
+          padding: 0.6rem 1.5rem;
+          font-size: 1rem;
+        }
+
+        .download-button svg {
+          width: 20px;
+          height: 20px;
+        }
+
+        .converter-options,
+        .image-options {
+          padding: 0.8rem;
+        }
+
+        .converter-options select,
+        .image-options select,
+        .image-options input[type="range"] {
+          font-size: 0.95rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>Multi-Tool</h1>
+        <p>File Converter & Image Processor</p>
+      </div>
+    </header>
+
+    <main>
+      <section class="tool-section" id="fileConverterSection">
+        <div class="container">
+          <div class="tool-card">
+            <h2>File Converter</h2>
+
+            <div id="converter-upload-area" class="upload-area">
+              <input
+                type="file"
+                id="converterFile"
+                accept=".pdf,image/*,.doc,.docx,.xls,.xlsx"
+                hidden
+              />
+              <label for="converterFile" class="upload-button">
+                <span id="converter-upload-text">Click to select a file</span>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-upload"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="17"></line>
+                </svg>
+              </label>
+              <p id="converter-file-info" class="file-info"></p>
+            </div>
+
+            <div
+              id="converterOptions"
+              class="converter-options"
+              style="display: none"
+            >
+              <div class="format-selector">
+                <label for="fromFormat">From Format:</label>
+                <select id="fromFormat" disabled></select>
+              </div>
+              <div class="format-selector">
+                <label for="toFormat">To Format:</label>
+                <select id="toFormat">
+                  <option value="pdf">PDF</option>
+                  <option value="jpg">JPG</option>
+                  <option value="png">PNG</option>
+                  <option value="docx">DOCX</option>
+                  <option value="xlsx">XLSX</option>
+                </select>
+              </div>
+            </div>
+
+            <button id="convertButton" class="convert-button" disabled>
+              Convert File
+            </button>
+
+            <div id="converter-status" class="status-message"></div>
+
+            <div
+              id="converter-download-area"
+              class="download-area"
+              style="display: none"
+            >
+              <h3>Conversion Status</h3>
+              <p>Awaiting backend processing result...</p>
+              <a
+                id="converter-downloadLink"
+                class="download-button"
+                href="#"
+                style="display: none"
+                download="converted_file"
+              >
+                Download Converted File
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-download"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </a>
+              <p class="backend-note">
+                <strong>Note:</strong> Converting between most formats requires
+                server-side processing (not included in this client-side code).
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-section" id="imageToolSection">
+        <div class="container">
+          <div class="tool-card">
+            <h2>Image Processor</h2>
+
+            <div id="image-upload-area" class="upload-area">
+              <input type="file" id="imageFile" accept="image/*" hidden />
+              <label for="imageFile" class="upload-button">
+                <span id="image-upload-text"
+                  >Click to select an Image file</span
+                >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-upload"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 0 0 1-2-2v-4"></path>
+                  <polyline points="17 8 12 3 7 8"></polyline>
+                  <line x1="12" y1="3" x2="12" y2="17"></line>
+                </svg>
+              </label>
+              <p id="image-file-info" class="file-info"></p>
+            </div>
+
+            <div id="imagePreviewArea">
+              <img id="imagePreview" src="#" alt="Image preview" />
+            </div>
+
+            <div id="imageOptions" class="image-options" style="display: none">
+              <div>
+                <label for="outputFormat">Output Format:</label>
+                <select id="outputFormat">
+                  <option value="image/png">PNG</option>
+                  <option value="image/jpeg">JPG</option>
+                  <option value="image/webp">WebP</option>
+                </select>
+              </div>
+              <div id="qualityOption" style="display: none">
+                <label for="imageQuality"
+                  >Quality (for JPG/WebP):
+                  <span id="qualityValue">90</span></label
+                >
+                <input
+                  type="range"
+                  id="imageQuality"
+                  min="1"
+                  max="100"
+                  value="90"
+                />
+              </div>
+            </div>
+
+            <button id="processImageButton" class="process-button" disabled>
+              Process Image
+            </button>
+
+            <div id="image-status" class="status-message"></div>
+
+            <div
+              id="image-download-area"
+              class="download-area"
+              style="display: none"
+            >
+              <h3>Processing Complete!</h3>
+              <p>Your processed image is ready for download.</p>
+              <a
+                id="image-downloadLink"
+                class="download-button"
+                href="#"
+                download="processed_image"
+              >
+                Download Image
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  class="feather feather-download"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 0 0 1-2-2v-4"></path>
+                  <polyline points="7 10 12 15 17 10"></polyline>
+                  <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="container">
+        <p>
+          &copy; <span id="current-year"></span> Your Website Name. All rights
+          reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.getElementById("current-year").textContent =
+        new Date().getFullYear();
+
+      // --- General File Converter Logic ---
+      const converterFileInp = document.getElementById("converterFile");
+      const converterUploadText = document.getElementById(
+        "converter-upload-text"
+      );
+      const converterFileInfo = document.getElementById("converter-file-info");
+      const converterOptionsDiv = document.getElementById("converterOptions");
+      const fromFormatSelect = document.getElementById("fromFormat");
+      const toFormatSelect = document.getElementById("toFormat");
+      const convertButton = document.getElementById("convertButton");
+      const converterStatus = document.getElementById("converter-status");
+      const converterDownloadArea = document.getElementById(
+        "converter-download-area"
+      );
+      const converterDownloadLink = document.getElementById(
+        "converter-downloadLink"
+      );
+
+      const supportedFormats = {
+        pdf: "PDF",
+        jpg: "JPG",
+        png: "PNG",
+        webp: "WebP",
+        doc: "DOC",
+        docx: "DOCX",
+        xls: "XLS",
+        xlsx: "XLSX",
+        // Add other formats here
+      };
+
+      converterFileInp.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+          converterUploadText.textContent = "File Selected:";
+          converterFileInfo.textContent = file.name;
+
+          // Attempt to guess 'From' format based on extension
+          const fileNameParts = file.name.split(".");
+          const fileExtension =
+            fileNameParts.length > 1 ? fileNameParts.pop().toLowerCase() : "";
+          let fromFormat = "";
+          for (const key in supportedFormats) {
+            if (key === fileExtension) {
+              fromFormat = key;
+              break;
+            }
+          }
+
+          // Populate 'From' select - only one option based on detected file type
+          fromFormatSelect.innerHTML = ""; // Clear existing options
+          if (fromFormat) {
+            const option = document.createElement("option");
+            option.value = fromFormat;
+            option.textContent = supportedFormats[fromFormat];
+            fromFormatSelect.appendChild(option);
+          } else {
+            // Handle unknown file type
+            const option = document.createElement("option");
+            option.value = "";
+            option.textContent = "Unknown Format";
+            fromFormatSelect.appendChild(option);
+            converterStatus.textContent = `Unsupported file type: .${fileExtension}`;
+            converterStatus.className = "status-message error";
+            converterOptionsDiv.style.display = "none";
+            convertButton.disabled = true;
+            return; // Exit if unsupported
+          }
+
+          // Populate 'To' select - show all supported formats except the 'From' format
+          toFormatSelect.innerHTML = ""; // Clear existing options
+          for (const key in supportedFormats) {
+            if (key !== fromFormat) {
+              const option = document.createElement("option");
+              option.value = key;
+              option.textContent = supportedFormats[key];
+              toFormatSelect.appendChild(option);
+            }
+          }
+
+          converterOptionsDiv.style.display = "flex"; // Use flexbox for options
+          convertButton.disabled = false;
+          converterStatus.textContent = "";
+          converterDownloadArea.style.display = "none";
+          converterDownloadLink.style.display = "none";
+        } else {
+          converterUploadText.textContent = "Click to select a file";
+          converterFileInfo.textContent = "";
+          converterOptionsDiv.style.display = "none";
+          convertButton.disabled = true;
+          converterStatus.textContent = "";
+          converterDownloadArea.style.display = "none";
+          converterDownloadLink.style.display = "none";
+          fromFormatSelect.innerHTML = ""; // Clear formats
+          toFormatSelect.innerHTML = "";
+        }
+      });
+
+      convertButton.addEventListener("click", function () {
+        const file = converterFileInp.files[0];
+        const fromFormat = fromFormatSelect.value;
+        const toFormat = toFormatSelect.value;
+
+        if (!file || !fromFormat || !toFormat) {
+          converterStatus.textContent =
+            "Please select a file and both formats.";
+          converterStatus.className = "status-message error";
+          return;
+        }
+
+        converterStatus.textContent = `Processing... Converting from ${fromFormat.toUpperCase()} to ${toFormat.toUpperCase()} (requires backend)`;
+        converterStatus.className = "status-message";
+        convertButton.disabled = true;
+        converterDownloadArea.style.display = "block";
+
+        // --- IMPORTANT ---
+        // This is where you would typically send the file, fromFormat, and toFormat
+        // to your backend server using fetch() or XMLHttpRequest. The backend would
+        // perform the conversion and return the converted file or a link to it.
+        //
+        // Client-side JS cannot reliably convert between complex formats like
+        // PDF <-> Excel, Word <-> PDF, etc. Some image conversions are possible
+        // client-side (handled in the Image Processor section below), but this
+        // general converter assumes backend for broad format support.
+        //
+        // Example Placeholder (Simulating backend success after a delay):
+        setTimeout(() => {
+          converterStatus.textContent =
+            "Conversion simulated! Actual conversion requires server-side.";
+          converterStatus.className = "status-message";
+
+          converterDownloadArea.querySelector("p").textContent =
+            "Awaiting backend processing result... (Backend not integrated)";
+          // In a real implementation, the backend would provide a downloadable URL
+          // converterDownloadLink.href = 'URL_FROM_BACKEND';
+          // converterDownloadLink.download = 'converted_' + file.name.split('.').slice(0, -1).join('.') + '.' + toFormat;
+          // converterDownloadLink.textContent = `Download .${toFormat.toUpperCase()} File`;
+          // converterDownloadLink.style.display = 'inline-flex';
+
+          converterDownloadLink.style.display = "none"; // Keep link hidden as it's non-functional
+
+          convertButton.disabled = false; // Re-enable button
+        }, 3000); // Simulate a 3-second processing time
+        // --- END IMPORTANT ---
+      });
+
+      // --- Image Processor Logic ---
+      const imageFileInp = document.getElementById("imageFile");
+      const imageUploadText = document.getElementById("image-upload-text");
+      const imageFileInfo = document.getElementById("image-file-info");
+      const imagePreview = document.getElementById("imagePreview");
+      const imageOptions = document.getElementById("imageOptions");
+      const outputFormatSelect = document.getElementById("outputFormat");
+      const qualityOptionDiv = document.getElementById("qualityOption");
+      const imageQualityInput = document.getElementById("imageQuality");
+      const qualityValueSpan = document.getElementById("qualityValue");
+      const processImageButton = document.getElementById("processImageButton");
+      const imageStatus = document.getElementById("image-status");
+      const imageDownloadArea = document.getElementById("image-download-area");
+      const imageDownloadLink = document.getElementById("image-downloadLink");
+
+      let uploadedImageFile = null;
+
+      imageFileInp.addEventListener("change", function () {
+        const file = this.files[0];
+        if (file) {
+          uploadedImageFile = file;
+          imageUploadText.textContent = "File Selected:";
+          imageFileInfo.textContent = file.name;
+          imageStatus.textContent = "";
+          imageDownloadArea.style.display = "none";
+          imageDownloadLink.href = "#";
+          imageDownloadLink.style.display = "none";
+
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = "block";
+            imageOptions.style.display = "block";
+            processImageButton.disabled = false;
+            updateQualityVisibility();
+          };
+          reader.readAsDataURL(file);
+        } else {
+          uploadedImageFile = null;
+          imageUploadText.textContent = "Click to select an Image file";
+          imageFileInfo.textContent = "";
+          imagePreview.src = "#";
+          imagePreview.style.display = "none";
+          imageOptions.style.display = "none";
+          processImageButton.disabled = true;
+          imageStatus.textContent = "";
+          imageDownloadArea.style.display = "none";
+          imageDownloadLink.href = "#";
+          imageDownloadLink.style.display = "none";
+        }
+      });
+
+      outputFormatSelect.addEventListener("change", updateQualityVisibility);
+
+      function updateQualityVisibility() {
+        const selectedFormat = outputFormatSelect.value;
+        if (
+          selectedFormat === "image/jpeg" ||
+          selectedFormat === "image/webp"
+        ) {
+          qualityOptionDiv.style.display = "block";
+        } else {
+          qualityOptionDiv.style.display = "none";
+        }
+      }
+
+      imageQualityInput.addEventListener("input", function () {
+        qualityValueSpan.textContent = this.value;
+      });
+
+      processImageButton.addEventListener("click", function () {
+        if (!uploadedImageFile) {
+          imageStatus.textContent = "Please select an image file first.";
+          imageStatus.className = "status-message error";
+          return;
+        }
+
+        imageStatus.textContent = "Processing image...";
+        imageStatus.className = "status-message";
+        processImageButton.disabled = true;
+        imageDownloadArea.style.display = "none";
+        imageDownloadLink.href = "#";
+        imageDownloadLink.style.display = "none";
+
+        const img = new Image();
+        img.onload = function () {
+          const canvas = document.createElement("canvas");
+          const ctx = canvas.getContext("2d");
+
+          canvas.width = img.width;
+          canvas.height = img.height;
+
+          ctx.drawImage(img, 0, 0, img.width, img.height);
+
+          const outputFormat = outputFormatSelect.value;
+          const quality = parseInt(imageQualityInput.value) / 100;
+
+          let fileName = uploadedImageFile.name
+            .split(".")
+            .slice(0, -1)
+            .join(".");
+          let outputExtension = "png";
+
+          canvas.toBlob(
+            function (blob) {
+              if (blob) {
+                const downloadUrl = URL.createObjectURL(blob);
+                imageDownloadLink.href = downloadUrl;
+
+                if (outputFormat === "image/jpeg") {
+                  outputExtension = "jpg";
+                } else if (outputFormat === "image/webp") {
+                  outputExtension = "webp";
+                } else {
+                  outputExtension = "png";
+                }
+
+                imageDownloadLink.download = `${fileName}.${outputExtension}`;
+                imageDownloadLink.textContent = `Download .${outputExtension.toUpperCase()} File`; // Use uppercase for consistency
+
+                imageStatus.textContent = "Processing complete!";
+                imageStatus.className = "status-message";
+                imageDownloadArea.style.display = "block";
+                imageDownloadLink.style.display = "inline-flex";
+              } else {
+                imageStatus.textContent = "Error processing image.";
+                imageStatus.className = "status-message error";
+              }
+
+              processImageButton.disabled = false;
+            },
+            outputFormat,
+            quality
+          );
+        };
+
+        img.onerror = function () {
+          imageStatus.textContent = "Error loading image.";
+          imageStatus.className = "status-message error";
+          processImageButton.disabled = false;
+        };
+
+        img.src = imagePreview.src;
+      });
+
+      imageFileInp.addEventListener("change", function () {
+        if (
+          imageDownloadLink.href &&
+          imageDownloadLink.href.startsWith("blob:")
+        ) {
+          URL.revokeObjectURL(imageDownloadLink.href);
+        }
+      });
+      window.addEventListener("beforeunload", function () {
+        if (
+          imageDownloadLink.href &&
+          imageDownloadLink.href.startsWith("blob:")
+        ) {
+          URL.revokeObjectURL(imageDownloadLink.href);
+        }
+      });
+    </script>
+  </body>
+</html>

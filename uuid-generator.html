@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>UUID Generator - Your Multi-Tool Website</title>
+    <style>
+      /* Basic Reset and Body Styling */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f6; /* Light grey background */
+        color: #333; /* Dark grey text */
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 15px; /* Padding on sides for mobile */
+      }
+
+      /* Header Styling */
+      header {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2em;
+      }
+
+      /* Tool Section Styling */
+      .tool-section {
+        background-color: #fff; /* White background */
+        padding: 25px;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .tool-section h2 {
+        color: #1e88e5; /* Bright Blue */
+        margin-top: 0;
+        border-bottom: 2px solid #e0e0e0; /* Light grey border */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Form Styling */
+      .form-group {
+        margin-bottom: 15px;
+        display: flex; /* Use flexbox for alignment */
+        align-items: center;
+        gap: 15px; /* Space between input and button */
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+      }
+
+      .form-group label {
+        margin-bottom: 0; /* Reset label margin */
+        flex-shrink: 0; /* Prevent label from shrinking */
+      }
+
+      .form-group input[type="number"] {
+        flex-grow: 1; /* Allow input to take available space */
+        max-width: 150px; /* Limit width of number input */
+        min-width: 80px; /* Minimum width */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1em;
+      }
+
+      button {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        flex-shrink: 0; /* Prevent button from shrinking */
+      }
+
+      button:hover {
+        background-color: #1565c0; /* Darker Blue on hover */
+      }
+
+      button:disabled {
+        background-color: #b0bec5; /* Grey when disabled */
+        cursor: not-allowed;
+      }
+
+      /* Output Area Styling */
+      #outputArea {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 2px solid #e0e0e0; /* Light grey border */
+      }
+
+      #outputArea h3 {
+        color: #1e88e5; /* Bright Blue */
+        margin-bottom: 15px;
+      }
+
+      #uuidList {
+        list-style: none; /* Remove default list bullets */
+        padding: 0;
+        margin: 0;
+        max-height: 400px; /* Limit height for scroll */
+        overflow-y: auto; /* Add scroll if list is long */
+        border: 1px solid #eee;
+        border-radius: 4px;
+        background-color: #f9f9f9; /* Very light grey background */
+      }
+
+      #uuidList li {
+        padding: 10px 15px;
+        border-bottom: 1px solid #eee;
+        font-family: monospace; /* Use monospace font for UUIDs */
+        word-break: break-all; /* Break long lines */
+      }
+
+      #uuidList li:last-child {
+        border-bottom: none; /* No border for the last item */
+      }
+
+      .no-results {
+        padding: 10px 15px;
+        font-style: italic;
+        color: #777;
+      }
+
+      /* Action Buttons Area (Copy/Download) */
+      .action-buttons {
+        margin-top: 15px;
+        text-align: center; /* Center the buttons */
+        display: none; /* Hidden by default */
+      }
+
+      .action-buttons button {
+        margin: 0 5px; /* Space between buttons */
+      }
+
+      .action-buttons button:first-child {
+        margin-left: 0;
+      }
+      .action-buttons button:last-child {
+        margin-right: 0;
+      }
+
+      #copyFeedback {
+        margin-top: 10px;
+        font-size: 0.9em;
+        color: #4caf50; /* Green */
+        display: none; /* Hidden by default */
+      }
+
+      #errorMessage {
+        margin-top: 20px;
+        padding: 10px;
+        background-color: #ffebee; /* Light red */
+        border: 1px solid #ef9a9a; /* Lighter red border */
+        color: #c62828; /* Dark red text */
+        border-radius: 4px;
+        display: none; /* Hidden by default */
+      }
+
+      /* Responsive Design */
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.5em;
+        }
+
+        .tool-section {
+          padding: 15px;
+        }
+
+        .form-group {
+          flex-direction: column; /* Stack elements vertically */
+          align-items: stretch; /* Stretch to fill width */
+          gap: 10px; /* Adjust gap */
+        }
+
+        .form-group label {
+          margin-bottom: 5px;
+        }
+
+        .form-group input[type="number"] {
+          max-width: 100%; /* Allow full width */
+        }
+
+        button {
+          width: 100%; /* Full width buttons */
+          margin: 5px 0; /* Adjust margins */
+        }
+
+        .action-buttons button {
+          margin: 5px 0; /* Stack action buttons */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>UUID Generator</h1>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="tool-section">
+        <h2>Generate Unique Identifiers</h2>
+
+        <div class="form-group">
+          <label for="numToGenerate">Number of UUIDs:</label>
+          <input
+            type="number"
+            id="numToGenerate"
+            value="1"
+            min="1"
+            max="1000"
+          />
+          <button id="generateBtn">Generate</button>
+        </div>
+
+        <div id="errorMessage" style="display: none"></div>
+
+        <div id="outputArea" style="display: none">
+          <h3>Generated UUIDs</h3>
+          <ul id="uuidList"></ul>
+          <div class="action-buttons">
+            <button id="copyBtn">Copy All</button>
+            <button id="downloadBtn">Download .txt</button>
+          </div>
+          <div id="copyFeedback" style="display: none">
+            Copied to clipboard!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const numToGenerateInput = document.getElementById("numToGenerate");
+      const generateBtn = document.getElementById("generateBtn");
+      const outputAreaDiv = document.getElementById("outputArea");
+      const uuidListUl = document.getElementById("uuidList");
+      const copyBtn = document.getElementById("copyBtn");
+      const downloadBtn = document.getElementById("downloadBtn");
+      const errorMessageDiv = document.getElementById("errorMessage");
+      const copyFeedbackDiv = document.getElementById("copyFeedback");
+      const actionButtonsDiv = outputAreaDiv.querySelector(".action-buttons");
+
+      // Function to display error messages
+      function displayError(message) {
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.style.display = "block";
+        outputAreaDiv.style.display = "none"; // Hide output on error
+      }
+
+      // Function to clear messages and output
+      function clearOutput() {
+        errorMessageDiv.style.display = "none";
+        errorMessageDiv.textContent = "";
+        uuidListUl.innerHTML = ""; // Clear previous UUIDs
+        outputAreaDiv.style.display = "none"; // Hide output area
+        copyFeedbackDiv.style.display = "none"; // Hide feedback
+      }
+
+      // Function to generate a single UUID v4
+      // Uses crypto.getRandomValues if available, falls back to Math.random
+      function generateUUIDv4() {
+        // Standard UUID v4 format: 8-4-4-4-12 hexadecimal digits
+        // '4' in the third group for version 4
+        // '8', '9', 'a', or 'b' in the first digit of the fourth group for variant 1
+
+        // Use cryptographically secure random numbers if available
+        if (
+          typeof window.crypto !== "undefined" &&
+          typeof window.crypto.getRandomValues === "function"
+        ) {
+          const randomBytes = new Uint8Array(16);
+          window.crypto.getRandomValues(randomBytes);
+
+          // Set version (4) and variant (1) bits
+          randomBytes[6] = (randomBytes[6] & 0x0f) | 0x40; // Version 4
+          randomBytes[8] = (randomBytes[8] & 0x3f) | 0x80; // Variant 1 (10xx)
+
+          // Format the bytes as hex string
+          let hex = "";
+          for (let i = 0; i < 16; i++) {
+            hex += randomBytes[i].toString(16).padStart(2, "0");
+          }
+
+          // Insert hyphens
+          return `${hex.substring(0, 8)}-${hex.substring(
+            8,
+            12
+          )}-${hex.substring(12, 16)}-${hex.substring(16, 20)}-${hex.substring(
+            20
+          )}`;
+        } else {
+          // Fallback to Math.random() (less secure but works)
+          // rfc4122.txt outlines the process, but Math.random is not truly random
+          // This simplified fallback is for compatibility if crypto is missing
+          // You could also implement a more robust fallback PRNG if needed
+          return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
+            /[xy]/g,
+            function (c) {
+              const r = (Math.random() * 16) | 0;
+              const v = c === "x" ? r : (r & 0x3) | 0x8; // Set variant bits for 'y'
+              return v.toString(16);
+            }
+          );
+        }
+      }
+
+      // Handle Generate button click
+      generateBtn.addEventListener("click", () => {
+        clearOutput(); // Clear previous results and messages
+
+        const numToGenerate = parseInt(numToGenerateInput.value, 10);
+
+        if (isNaN(numToGenerate) || numToGenerate <= 0) {
+          displayError(
+            "Please enter a valid positive number of UUIDs to generate."
+          );
+          return;
+        }
+
+        // Optional: Limit the number to prevent performance issues with very large requests
+        const maxLimit = 1000;
+        if (numToGenerate > maxLimit) {
+          displayError(
+            `Generating more than ${maxLimit} UUIDs at once is not recommended. Please enter a number up to ${maxLimit}.`
+          );
+          return;
+        }
+
+        outputAreaDiv.style.display = "block"; // Show output area
+        actionButtonsDiv.style.display = "block"; // Show copy/download buttons
+
+        // Add a placeholder while generating for large numbers
+        if (numToGenerate > 10) {
+          // Show placeholder if generating more than a few
+          uuidListUl.innerHTML = '<li class="no-results">Generating...</li>';
+        } else {
+          uuidListUl.innerHTML = ""; // Clear immediately for small numbers
+        }
+
+        // Generate and display UUIDs
+        const generatedUUIDs = [];
+        for (let i = 0; i < numToGenerate; i++) {
+          const uuid = generateUUIDv4();
+          generatedUUIDs.push(uuid);
+
+          const listItem = document.createElement("li");
+          listItem.textContent = uuid;
+          uuidListUl.appendChild(listItem);
+        }
+
+        // Remove placeholder if it was added
+        if (
+          numToGenerate > 10 &&
+          uuidListUl.firstElementChild &&
+          uuidListUl.firstElementChild.classList.contains("no-results")
+        ) {
+          uuidListUl.removeChild(uuidListUl.firstElementChild);
+        }
+
+        // Store generated UUIDs for copy/download (optional, can also read from DOM)
+        uuidListUl.dataset.uuids = generatedUUIDs.join("\n");
+      });
+
+      // Handle Copy button click
+      copyBtn.addEventListener("click", () => {
+        const uuidsText = uuidListUl.dataset.uuids; // Get from dataset
+
+        if (!uuidsText) {
+          displayError("No UUIDs to copy.");
+          return;
+        }
+
+        // Use the Clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard
+            .writeText(uuidsText)
+            .then(() => {
+              // Success feedback
+              copyFeedbackDiv.textContent =
+                "Copied " + uuidsText.split("\n").length + " UUID(s)!";
+              copyFeedbackDiv.style.display = "block";
+              // Hide feedback after a few seconds
+              setTimeout(() => {
+                copyFeedbackDiv.style.display = "none";
+              }, 3000);
+            })
+            .catch((err) => {
+              // Error feedback
+              displayError("Failed to copy UUIDs: " + err);
+            });
+        } else {
+          // Fallback for browsers that don't support Clipboard API
+          displayError(
+            "Clipboard API not supported in this browser. Please manually copy from the list."
+          );
+        }
+      });
+
+      // Handle Download button click
+      downloadBtn.addEventListener("click", () => {
+        const uuidsText = uuidListUl.dataset.uuids; // Get from dataset
+
+        if (!uuidsText) {
+          displayError("No UUIDs to download.");
+          return;
+        }
+
+        const blob = new Blob([uuidsText], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "uuids_" + Date.now() + ".txt"; // Dynamic filename
+        document.body.appendChild(a); // Append to body to make it clickable
+        a.click(); // Programmatically click the link
+
+        // Clean up the temporary link and object URL
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      });
+
+      // Initial state setup: hide output area and action buttons
+      outputAreaDiv.style.display = "none";
+      actionButtonsDiv.style.display = "none"; // Ensure buttons are hidden initially
+    </script>
+  </body>
+</html>

@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Timezone Converter - Multi-Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        flex: 1;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        color: #007bff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .tool-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      input[type="datetime-local"],
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .conversion-group {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .conversion-group > div {
+        flex: 1;
+        min-width: 250px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .password-group {
+        margin-bottom: 20px;
+      }
+
+      .password-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .output-group {
+        margin-top: 20px;
+      }
+
+      #output {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        min-height: 100px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      .error {
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background: #007bff;
+        color: #fff;
+        margin-top: auto;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .conversion-group {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Timezone Converter</h1>
+        <p>Convert times between different global time zones.</p>
+      </header>
+
+      <section class="tool-section">
+        <div class="conversion-group">
+          <div class="input-group">
+            <label for="sourceTime">Source Time</label>
+            <input
+              type="datetime-local"
+              id="sourceTime"
+              oninput="convertTime()"
+            />
+            <div id="sourceTimeError" class="error"></div>
+          </div>
+          <div class="input-group">
+            <label for="sourceTimezone">Source Timezone</label>
+            <select id="sourceTimezone" onchange="convertTime()">
+              <option value="UTC">UTC</option>
+              <option value="America/New_York">America/New_York</option>
+              <option value="Europe/London">Europe/London</option>
+              <option value="Asia/Tokyo">Asia/Tokyo</option>
+              <option value="Australia/Sydney">Australia/Sydney</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="targetTimezone">Target Timezone</label>
+          <select id="targetTimezone" onchange="convertTime()">
+            <option value="UTC">UTC</option>
+            <option value="America/New_York">America/New_York</option>
+            <option value="Europe/London">Europe/London</option>
+            <option value="Asia/Tokyo">Asia/Tokyo</option>
+            <option value="Australia/Sydney">Australia/Sydney</option>
+          </select>
+        </div>
+
+        <div class="password-group">
+          <input
+            type="password"
+            id="password"
+            placeholder="Optional: Enter password to protect output file"
+          />
+        </div>
+
+        <button onclick="convertTime()">Convert Time</button>
+
+        <div class="output-group">
+          <div id="output"></div>
+          <button onclick="downloadOutput()" style="margin-top: 10px">
+            Download Results
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>© 2025 Multi-Tool Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function formatDateTime(date, timezone) {
+        return new Intl.DateTimeFormat("en-US", {
+          timeZone: timezone,
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          hour12: true,
+        }).format(date);
+      }
+
+      function convertTime() {
+        const sourceTimeInput = document.getElementById("sourceTime").value;
+        const sourceTimezone = document.getElementById("sourceTimezone").value;
+        const targetTimezone = document.getElementById("targetTimezone").value;
+        const sourceTimeError = document.getElementById("sourceTimeError");
+        const output = document.getElementById("output");
+
+        if (!sourceTimeInput) {
+          sourceTimeError.textContent = "Please select a source time.";
+          output.textContent = "";
+          return;
+        }
+
+        sourceTimeError.textContent = "";
+
+        try {
+          const sourceDate = new Date(sourceTimeInput);
+          if (isNaN(sourceDate)) {
+            sourceTimeError.textContent = "Invalid date/time format.";
+            output.textContent = "";
+            return;
+          }
+
+          const sourceFormatted = formatDateTime(sourceDate, sourceTimezone);
+          const targetFormatted = formatDateTime(sourceDate, targetTimezone);
+
+          const result =
+            `Timezone Conversion Results:\n\n` +
+            `Source Time: ${sourceFormatted}\n` +
+            `Source Timezone: ${sourceTimezone}\n\n` +
+            `Target Time: ${targetFormatted}\n` +
+            `Target Timezone: ${targetTimezone}`;
+
+          output.textContent = result;
+        } catch (e) {
+          sourceTimeError.textContent = "Error converting time: " + e.message;
+          output.textContent = "";
+        }
+      }
+
+      function downloadOutput() {
+        const output = document.getElementById("output").textContent;
+        const password = document.getElementById("password").value;
+
+        if (!output) {
+          alert("Please convert a time first!");
+          return;
+        }
+
+        const blob = new Blob([output], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = password
+          ? "timezone_conversion_protected.txt"
+          : "timezone_conversion.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (password) {
+          alert(
+            "Note: Password protection is simulated for this demo. The file is not actually encrypted."
+          );
+        }
+      }
+    </script>
+  </body>
+</html>

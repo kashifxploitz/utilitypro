@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSON Formatter - Multi-Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        flex: 1;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        color: #007bff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .tool-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        resize: vertical;
+        font-size: 1em;
+        margin-bottom: 10px;
+        font-family: "Courier New", monospace;
+      }
+
+      .options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .password-group {
+        margin-bottom: 20px;
+      }
+
+      .password-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .output-group {
+        margin-top: 20px;
+      }
+
+      #output {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        min-height: 100px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: "Courier New", monospace;
+      }
+
+      .error {
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 5px;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background: #007bff;
+        color: #fff;
+        margin-top: auto;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .options {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>JSON Formatter</h1>
+        <p>Validate, beautify, and format JSON data with ease.</p>
+      </header>
+
+      <section class="tool-section">
+        <div class="input-group">
+          <textarea
+            id="inputJson"
+            placeholder="Enter your JSON data here..."
+          ></textarea>
+          <div id="error" class="error"></div>
+        </div>
+
+        <div class="options">
+          <div class="option">
+            <input
+              type="radio"
+              name="formatType"
+              id="beautify"
+              value="beautify"
+              checked
+            />
+            <label for="beautify">Beautify JSON</label>
+          </div>
+          <div class="option">
+            <input type="radio" name="formatType" id="minify" value="minify" />
+            <label for="minify">Minify JSON</label>
+          </div>
+        </div>
+
+        <div class="password-group">
+          <input
+            type="password"
+            id="password"
+            placeholder="Optional: Enter password to protect output file"
+          />
+        </div>
+
+        <button onclick="formatJson()">Format JSON</button>
+
+        <div class="output-group">
+          <div id="output"></div>
+          <button onclick="downloadOutput()" style="margin-top: 10px">
+            Download Result
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>© 2025 Multi-Tool Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function formatJson() {
+        const input = document.getElementById("inputJson").value;
+        const formatType = document.querySelector(
+          'input[name="formatType"]:checked'
+        ).value;
+        const errorDiv = document.getElementById("error");
+        const outputDiv = document.getElementById("output");
+
+        errorDiv.textContent = "";
+        outputDiv.textContent = "";
+
+        if (!input.trim()) {
+          errorDiv.textContent = "Please enter JSON data.";
+          return;
+        }
+
+        try {
+          const jsonObj = JSON.parse(input);
+          let result = "";
+
+          if (formatType === "beautify") {
+            result = JSON.stringify(jsonObj, null, 2);
+          } else if (formatType === "minify") {
+            result = JSON.stringify(jsonObj);
+          }
+
+          outputDiv.textContent = result;
+        } catch (e) {
+          errorDiv.textContent = "Invalid JSON: " + e.message;
+        }
+      }
+
+      function downloadOutput() {
+        const output = document.getElementById("output").textContent;
+        const password = document.getElementById("password").value;
+
+        if (!output) {
+          alert("Please format some JSON first!");
+          return;
+        }
+
+        const blob = new Blob([output], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = password
+          ? "formatted_json_protected.json"
+          : "formatted_json.json";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (password) {
+          alert(
+            "Note: Password protection is simulated for this demo. The file is not actually encrypted."
+          );
+        }
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Loan EMI Calculator - My Multi-Tool Website</title>
+    <style>
+      /* General Styles */
+      :root {
+        --primary-blue: #007bff; /* Bright Blue */
+        --secondary-blue: #e9f5ff; /* Lighter Blue for backgrounds */
+        --text-color: #333;
+        --border-color: #ccc;
+        --white: #fff;
+        --padding-base: 15px;
+        --margin-base: 20px;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background-color: var(--secondary-blue);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Align to top */
+        min-height: 100vh;
+        padding-top: var(--margin-base); /* Add some space at the top */
+      }
+
+      .container {
+        background-color: var(--white);
+        padding: var(--margin-base);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+        margin-bottom: var(--margin-base); /* Space at the bottom */
+      }
+
+      h1 {
+        color: var(--primary-blue);
+        margin-bottom: 10px;
+      }
+
+      p {
+        margin-bottom: var(--margin-base);
+        color: #555;
+      }
+
+      /* Input Group Styles */
+      .input-group {
+        margin-bottom: var(--margin-base);
+        text-align: left; /* Align label/input nicely */
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      .input-group input[type="number"] {
+        width: 100%;
+        padding: var(--padding-base) 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        box-sizing: border-box; /* Include padding in width */
+        font-size: 1rem;
+      }
+
+      .input-group input[type="number"]::-webkit-outer-spin-button,
+      .input-group input[type="number"]::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .input-group input[type="number"] {
+        -moz-appearance: textfield;
+      }
+
+      /* Button Styles */
+      .btn-primary {
+        display: block;
+        width: 100%;
+        padding: var(--padding-base);
+        background-color: var(--primary-blue);
+        color: var(--white);
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        margin-bottom: var(--margin-base); /* Space below button */
+      }
+
+      .btn-primary:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+      }
+
+      .btn-primary:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+
+      /* Results Area Styles */
+      #results {
+        margin-top: var(--margin-base);
+        padding: var(--padding-base);
+        border-top: 1px solid var(--border-color);
+        text-align: left;
+      }
+
+      #results div {
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+      }
+
+      #results div strong {
+        color: var(--primary-blue);
+        display: inline-block; /* Align value nicely */
+        min-width: 150px; /* Give label a minimum width */
+      }
+
+      #results div span {
+        font-weight: normal;
+      }
+
+      /* Error Message Styles */
+      #errorMessage {
+        color: #dc3545; /* Red */
+        margin-top: 10px;
+        min-height: 1.2em; /* Reserve space */
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 600px) {
+        .container {
+          padding: var(--padding-base);
+          margin-left: var(--padding-base);
+          margin-right: var(--padding-base);
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .btn-primary {
+          font-size: 1rem;
+          padding: 12px;
+        }
+
+        #results div {
+          font-size: 1rem;
+          margin-bottom: 8px;
+        }
+        #results div strong {
+          min-width: 120px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Loan EMI Calculator</h1>
+      <p>Calculate your Equated Monthly Installments.</p>
+
+      <div class="input-group">
+        <label for="loanAmount">Loan Amount ($):</label>
+        <input
+          type="number"
+          id="loanAmount"
+          min="1"
+          step="any"
+          placeholder="e.g., 100000"
+          required
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="interestRate">Annual Interest Rate (%):</label>
+        <input
+          type="number"
+          id="interestRate"
+          min="0"
+          step="any"
+          placeholder="e.g., 8.5"
+          required
+        />
+      </div>
+
+      <div class="input-group">
+        <label for="loanTenure">Loan Tenure (Years):</label>
+        <input
+          type="number"
+          id="loanTenure"
+          min="1"
+          step="1"
+          placeholder="e.g., 15"
+          required
+        />
+      </div>
+
+      <button class="btn-primary" id="calculateBtn">Calculate EMI</button>
+
+      <div id="errorMessage"></div>
+
+      <div id="results" style="display: none">
+        <div>
+          <strong>Equated Monthly Installment (EMI):</strong>
+          <span id="emiResult"></span>
+        </div>
+        <div>
+          <strong>Total Interest Payable:</strong>
+          <span id="totalInterest"></span>
+        </div>
+        <div>
+          <strong>Total Payment (Principal + Interest):</strong>
+          <span id="totalPayment"></span>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const loanAmountInput = document.getElementById("loanAmount");
+      const interestRateInput = document.getElementById("interestRate");
+      const loanTenureInput = document.getElementById("loanTenure");
+      const calculateBtn = document.getElementById("calculateBtn");
+      const errorMessageDiv = document.getElementById("errorMessage");
+      const resultsDiv = document.getElementById("results");
+      const emiResultSpan = document.getElementById("emiResult");
+      const totalInterestSpan = document.getElementById("totalInterest");
+      const totalPaymentSpan = document.getElementById("totalPayment");
+
+      // Function to calculate EMI
+      function calculateEMI() {
+        const principal = parseFloat(loanAmountInput.value);
+        const annualInterestRate = parseFloat(interestRateInput.value);
+        const loanTenureYears = parseFloat(loanTenureInput.value);
+
+        // Basic validation
+        if (
+          isNaN(principal) ||
+          isNaN(annualInterestRate) ||
+          isNaN(loanTenureYears) ||
+          principal <= 0 ||
+          annualInterestRate < 0 ||
+          loanTenureYears <= 0
+        ) {
+          displayError("Please enter valid positive numbers for all fields.");
+          hideResults();
+          return;
+        }
+
+        // Convert annual rate to monthly rate and years to months
+        const monthlyInterestRate = annualInterestRate / 100 / 12;
+        const numberOfMonths = loanTenureYears * 12;
+
+        let emi;
+
+        // EMI Calculation using the formula
+        // M = P * [ R * (1 + R)^N ] / [ (1 + R)^N – 1]
+        // Where:
+        // M = Monthly Payment (EMI)
+        // P = Principal Loan Amount
+        // R = Monthly Interest Rate (Annual Rate / 12 / 100)
+        // N = Total Number of Months (Loan Tenure in years * 12)
+
+        if (monthlyInterestRate === 0) {
+          // Handle 0% interest rate case
+          emi = principal / numberOfMonths;
+        } else {
+          const numerator =
+            principal *
+            monthlyInterestRate *
+            Math.pow(1 + monthlyInterestRate, numberOfMonths);
+          const denominator =
+            Math.pow(1 + monthlyInterestRate, numberOfMonths) - 1;
+          emi = numerator / denominator;
+        }
+
+        const totalPayment = emi * numberOfMonths;
+        const totalInterest = totalPayment - principal;
+
+        // Display results
+        displayResults(emi, totalInterest, totalPayment);
+        clearError();
+      }
+
+      // Function to display results
+      function displayResults(emi, totalInterest, totalPayment) {
+        emiResultSpan.textContent = "$" + emi.toFixed(2);
+        totalInterestSpan.textContent = "$" + totalInterest.toFixed(2);
+        totalPaymentSpan.textContent = "$" + totalPayment.toFixed(2);
+        resultsDiv.style.display = "block"; // Show the results div
+      }
+
+      // Function to hide results
+      function hideResults() {
+        resultsDiv.style.display = "none";
+      }
+
+      // Function to display error message
+      function displayError(message) {
+        errorMessageDiv.textContent = message;
+      }
+
+      // Function to clear error message
+      function clearError() {
+        errorMessageDiv.textContent = "";
+      }
+
+      // Add event listener to the button
+      calculateBtn.addEventListener("click", calculateEMI);
+
+      // Optional: Clear results/errors when inputs change
+      const inputs = [loanAmountInput, interestRateInput, loanTenureInput];
+      inputs.forEach((input) => {
+        input.addEventListener("input", () => {
+          hideResults();
+          clearError();
+        });
+      });
+
+      // Calculate on pressing Enter key in any input field
+      inputs.forEach((input) => {
+        input.addEventListener("keypress", function (event) {
+          if (event.key === "Enter") {
+            event.preventDefault(); // Prevent default form submission if it were in a form
+            calculateBtn.click(); // Trigger the button click
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

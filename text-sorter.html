@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Text Sorter</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f8ff; /* Light blue background */
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .container {
+        background-color: #ffffff; /* White background */
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 900px;
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+        border: 1px solid #e0e0e0; /* Light border */
+      }
+
+      h1 {
+        color: #007bff; /* Bright blue for headings */
+        margin-bottom: 25px;
+        font-size: 2.5em;
+        font-weight: 700;
+      }
+
+      p {
+        margin-bottom: 20px;
+        font-size: 1.1em;
+        color: #555;
+      }
+
+      /* Input/Output Areas */
+      textarea {
+        width: calc(100% - 20px);
+        height: 250px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #add8e6; /* Light blue border */
+        border-radius: 8px;
+        font-size: 1.1em;
+        resize: vertical;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: border-color 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #007bff;
+      }
+
+      #sortedTextContent {
+        background-color: #f9f9f9;
+        border: 1px solid #add8e6;
+        border-radius: 8px;
+        padding: 15px;
+        height: 250px; /* Same height as input */
+        margin-top: 20px;
+        text-align: left;
+        overflow-y: auto;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        white-space: pre-wrap; /* Preserve line breaks */
+        font-size: 1.1em;
+        color: #333;
+      }
+
+      /* Controls */
+      .controls {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      .controls label {
+        font-weight: bold;
+        color: #007bff;
+        font-size: 1.05em;
+      }
+
+      .controls select {
+        padding: 10px;
+        border: 1px solid #add8e6;
+        border-radius: 8px;
+        font-size: 1em;
+        background-color: #f0faff;
+        color: #333;
+        appearance: none; /* Remove default arrow */
+        background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007bff%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13.2-6.4H18.2c-5%200-9.3%201.8-13.2%206.4-3.9%204.6-6%2010.4-6%2016.3%200%206.2%202.1%2011.9%206%2016.3l118.8%20127.3c3.9%204.3%209.1%206.4%2014.2%206.4s10.3-2.1%2014.2-6.4L287%20102c3.9-4.3%206-10.1%206-16.3%200-5.8-2.1-11.6-6-16.1z%22%2F%3E%3C%2Fsvg%3E");
+        background-repeat: no-repeat;
+        background-position: right 10px top 50%;
+        background-size: 12px auto;
+        min-width: 150px;
+      }
+
+      /* Buttons */
+      .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        background-color: #007bff; /* Bright blue button */
+        color: white;
+        padding: 14px 28px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        flex-grow: 1;
+        max-width: 200px;
+      }
+
+      button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+      }
+
+      input[type="file"] {
+        display: none; /* Hide default file input */
+      }
+
+      .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+      }
+
+      .upload-btn-wrapper button {
+        background-color: #28a745; /* Green for upload */
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+      }
+
+      .upload-btn-wrapper button:hover {
+        background-color: #218838;
+      }
+
+      /* Loader */
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        display: none; /* Hidden by default */
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Password Protection Overlay */
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .password-prompt {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+
+      .password-prompt h3 {
+        color: #007bff;
+        margin-bottom: 20px;
+        font-size: 1.6em;
+      }
+
+      .password-prompt input[type="password"] {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #add8e6;
+        border-radius: 8px;
+        font-size: 1.1em;
+      }
+
+      .error-message {
+        color: #dc3545; /* Red for error messages */
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      /* Download Link */
+      #downloadLink {
+        display: none; /* Hidden by default */
+        margin-top: 20px;
+        padding: 12px 25px;
+        background-color: #17a2b8; /* Info blue for download */
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+        display: inline-block;
+      }
+
+      #downloadLink:hover {
+        background-color: #138496;
+        transform: translateY(-2px);
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+
+        .container {
+          padding: 20px;
+          border-radius: 8px;
+        }
+
+        h1 {
+          font-size: 2em;
+          margin-bottom: 20px;
+        }
+
+        p {
+          font-size: 1em;
+          margin-bottom: 15px;
+        }
+
+        textarea,
+        #sortedTextContent {
+          height: 200px;
+          padding: 10px;
+          font-size: 1em;
+        }
+
+        button {
+          padding: 12px 20px;
+          font-size: 1em;
+          flex-grow: unset;
+          width: 100%;
+          max-width: 250px;
+        }
+
+        .btn-group {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .controls {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .password-prompt {
+          padding: 20px;
+        }
+
+        .password-prompt h3 {
+          font-size: 1.4em;
+        }
+
+        .password-prompt input[type="password"] {
+          padding: 10px;
+          font-size: 1em;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 1.8em;
+        }
+
+        p {
+          font-size: 0.9em;
+        }
+
+        textarea,
+        #sortedTextContent {
+          height: 150px;
+        }
+
+        button {
+          padding: 10px 15px;
+          font-size: 0.95em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Text Sorter</h1>
+      <p>
+        Sort lines of text alphabetically or numerically, ascending or
+        descending.
+      </p>
+
+      <textarea
+        id="textContent"
+        placeholder="Paste your text content here (each line will be treated as a separate item)..."
+      ></textarea>
+
+      <div class="btn-group">
+        <div class="upload-btn-wrapper">
+          <button
+            type="button"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            Upload .txt File
+          </button>
+          <input type="file" id="fileInput" accept=".txt" />
+        </div>
+        <button onclick="clearContent()">Clear Content</button>
+      </div>
+
+      <div class="controls">
+        <label for="sortType">Sort By:</label>
+        <select id="sortType">
+          <option value="alphabetical">Alphabetical</option>
+          <option value="numerical">Numerical</option>
+        </select>
+
+        <label for="sortOrder">Order:</label>
+        <select id="sortOrder">
+          <option value="ascending">Ascending</option>
+          <option value="descending">Descending</option>
+        </select>
+
+        <button onclick="sortText()">Sort Text</button>
+      </div>
+
+      <div class="loader" id="loader"></div>
+
+      <h2>Sorted Text</h2>
+      <div id="sortedTextContent">Your sorted text will appear here.</div>
+
+      <a id="downloadLink" href="#" download="sorted_text.txt"
+        >Download Sorted Text</a
+      >
+    </div>
+
+    <div class="overlay" id="passwordOverlay">
+      <div class="password-prompt">
+        <h3>Enter Password to Download</h3>
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="Enter password"
+        />
+        <p class="error-message" id="passwordError"></p>
+        <button onclick="verifyPassword()">Submit</button>
+        <button
+          onclick="closePasswordPrompt()"
+          style="background-color: #6c757d; margin-left: 10px"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Simple password for demonstration. In a real application, consider more robust security.
+      const DOWNLOAD_PASSWORD = "yourpassword123"; // CHANGE THIS TO A SECURE PASSWORD!
+
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", handleFileUpload);
+
+      let sortedOutputContent = ""; // To store the content for download
+
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById("textContent").value = e.target.result;
+            sortText(); // Automatically sort after upload
+          };
+          reader.readAsText(file);
+        }
+      }
+
+      function sortText() {
+        const textContent = document.getElementById("textContent").value.trim();
+        const sortType = document.getElementById("sortType").value;
+        const sortOrder = document.getElementById("sortOrder").value;
+        const sortedTextContentDiv =
+          document.getElementById("sortedTextContent");
+        const loader = document.getElementById("loader");
+        const downloadLink = document.getElementById("downloadLink");
+
+        // Hide previous download link and show loader
+        downloadLink.style.display = "none";
+        loader.style.display = "block";
+        sortedTextContentDiv.textContent = "Sorting...";
+
+        if (textContent === "") {
+          sortedTextContentDiv.textContent = "Please enter some text to sort.";
+          loader.style.display = "none";
+          return;
+        }
+
+        // Simulate a slight delay for loader visibility
+        setTimeout(() => {
+          const lines = textContent
+            .split(/\r?\n/)
+            .filter((line) => line.trim() !== ""); // Split by new line, remove empty lines
+
+          if (lines.length === 0) {
+            sortedTextContentDiv.textContent = "No valid lines to sort.";
+            loader.style.display = "none";
+            return;
+          }
+
+          if (sortType === "alphabetical") {
+            lines.sort((a, b) => {
+              const valA = a.toLowerCase();
+              const valB = b.toLowerCase();
+              if (valA < valB) return sortOrder === "ascending" ? -1 : 1;
+              if (valA > valB) return sortOrder === "ascending" ? 1 : -1;
+              return 0;
+            });
+          } else if (sortType === "numerical") {
+            lines.sort((a, b) => {
+              const numA = parseFloat(a);
+              const numB = parseFloat(b);
+
+              // Handle non-numeric lines by pushing them to the end or beginning
+              if (isNaN(numA) && isNaN(numB)) return 0; // Both non-numeric, maintain relative order
+              if (isNaN(numA)) return sortOrder === "ascending" ? 1 : -1; // numA is not a number, push it to the end
+              if (isNaN(numB)) return sortOrder === "ascending" ? -1 : 1; // numB is not a number, push it to the end
+
+              return sortOrder === "ascending" ? numA - numB : numB - numA;
+            });
+          }
+
+          sortedOutputContent = lines.join("\n");
+          sortedTextContentDiv.textContent = sortedOutputContent;
+          downloadLink.style.display = "inline-block";
+          loader.style.display = "none";
+        }, 500); // 0.5 second delay
+      }
+
+      function clearContent() {
+        document.getElementById("textContent").value = "";
+        document.getElementById("sortedTextContent").textContent =
+          "Your sorted text will appear here.";
+        document.getElementById("downloadLink").style.display = "none";
+        sortedOutputContent = "";
+      }
+
+      function showPasswordPrompt() {
+        document.getElementById("passwordOverlay").style.display = "flex";
+        document.getElementById("passwordInput").value = ""; // Clear previous input
+        document.getElementById("passwordError").textContent = ""; // Clear previous error
+        document.getElementById("passwordInput").focus(); // Focus on the input
+      }
+
+      function closePasswordPrompt() {
+        document.getElementById("passwordOverlay").style.display = "none";
+      }
+
+      function verifyPassword() {
+        const enteredPassword = document.getElementById("passwordInput").value;
+        const passwordError = document.getElementById("passwordError");
+        const downloadLink = document.getElementById("downloadLink");
+
+        if (enteredPassword === DOWNLOAD_PASSWORD) {
+          if (sortedOutputContent) {
+            const blob = new Blob([sortedOutputContent], {
+              type: "text/plain",
+            });
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.click(); // Trigger download
+            URL.revokeObjectURL(downloadLink.href); // Clean up the URL object
+            closePasswordPrompt();
+          } else {
+            passwordError.textContent = "No content to download.";
+          }
+        } else {
+          passwordError.textContent = "Incorrect password. Please try again.";
+        }
+      }
+
+      // Event listener for the download button (which now triggers the password prompt)
+      document
+        .getElementById("downloadLink")
+        .addEventListener("click", function (e) {
+          // Only prevent default if we have content to download and it's not already set as an object URL
+          if (sortedOutputContent && !this.href.startsWith("blob:")) {
+            e.preventDefault(); // Stop immediate download
+            showPasswordPrompt();
+          }
+          // If href is already a blob URL (meaning password was correct), allow default action
+        });
+
+      // Initialize display for the download link
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("downloadLink").style.display = "none";
+      });
+    </script>
+  </body>
+</html>

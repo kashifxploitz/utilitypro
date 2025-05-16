@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Case Converter | Multi-Tool Website</title>
+    <style>
+      :root {
+        --primary-blue: #4285f4;
+        --light-blue: #e8f0fe;
+        --white: #ffffff;
+        --light-gray: #f5f5f5;
+        --medium-gray: #e0e0e0;
+        --dark-gray: #5f6368;
+        --black: #202124;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+          "Helvetica Neue", sans-serif;
+      }
+
+      body {
+        background-color: var(--light-gray);
+        color: var(--black);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background-color: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .header {
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+
+      .converter {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      label {
+        font-weight: 500;
+        color: var(--dark-gray);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border: 1px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+        transition: all 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 2px var(--light-blue);
+      }
+
+      .button-group {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      button {
+        padding: 12px;
+        background-color: var(--light-blue);
+        color: var(--primary-blue);
+        border: none;
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      button:hover {
+        background-color: #d7e3fc;
+      }
+
+      button.primary {
+        background-color: var(--primary-blue);
+        color: var(--white);
+      }
+
+      button.primary:hover {
+        background-color: #3367d6;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .action-buttons button {
+        flex: 1;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        color: var(--dark-gray);
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      @media (max-width: 600px) {
+        .button-group {
+          grid-template-columns: 1fr 1fr;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .header h1 {
+          font-size: 1.5rem;
+        }
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Case Converter</h1>
+        <p>Transform text between uppercase, lowercase, title case and more</p>
+      </div>
+
+      <div class="converter">
+        <div class="input-group">
+          <label for="input-text">Your Text</label>
+          <textarea
+            id="input-text"
+            placeholder="Enter or paste your text here..."
+          ></textarea>
+          <div class="stats">
+            <span id="char-count">0 characters</span>
+            <span id="word-count">0 words</span>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button onclick="convertCase('uppercase')">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 19h18v2H3zM10 3v11h4V3zM3 11h18v2H3z" />
+            </svg>
+            UPPERCASE
+          </button>
+          <button onclick="convertCase('lowercase')">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 19h18v2H3zM10 3v11h4V3zM3 11h18v2H3z" />
+            </svg>
+            lowercase
+          </button>
+          <button onclick="convertCase('titlecase')">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 19h18v2H3zM4 3h4v11h4V3h4v18h-4v-6H8v6H4z" />
+            </svg>
+            Title Case
+          </button>
+          <button onclick="convertCase('sentencecase')">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 19h18v2H3zM4 3h4v11h4V3h4v18h-4v-6H8v6H4z" />
+            </svg>
+            Sentence case
+          </button>
+          <button onclick="convertCase('capitalize')">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 19h18v2H3zM4 3h4v11h4V3h4v18h-4v-6H8v6H4z" />
+            </svg>
+            Capitalize Words
+          </button>
+          <button onclick="convertCase('invertcase')">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M3 19h18v2H3zM10 3v11h4V3zM3 11h18v2H3z" />
+            </svg>
+            iNVERT cASE
+          </button>
+        </div>
+
+        <div class="input-group">
+          <label for="output-text">Converted Text</label>
+          <textarea id="output-text" readonly></textarea>
+          <div class="stats">
+            <span id="output-char-count">0 characters</span>
+            <span id="output-word-count">0 words</span>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="primary" onclick="copyToClipboard()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path
+                d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+              ></path>
+            </svg>
+            Copy to Clipboard
+          </button>
+          <button onclick="clearText()">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              ></path>
+            </svg>
+            Clear Text
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const inputText = document.getElementById("input-text");
+      const outputText = document.getElementById("output-text");
+      const charCount = document.getElementById("char-count");
+      const wordCount = document.getElementById("word-count");
+      const outputCharCount = document.getElementById("output-char-count");
+      const outputWordCount = document.getElementById("output-word-count");
+
+      // Update character and word counts
+      inputText.addEventListener("input", updateStats);
+      outputText.addEventListener("input", updateOutputStats);
+
+      function updateStats() {
+        const text = inputText.value;
+        const chars = text.length;
+        const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+
+        charCount.textContent = `${chars} character${chars !== 1 ? "s" : ""}`;
+        wordCount.textContent = `${words} word${words !== 1 ? "s" : ""}`;
+      }
+
+      function updateOutputStats() {
+        const text = outputText.value;
+        const chars = text.length;
+        const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+
+        outputCharCount.textContent = `${chars} character${
+          chars !== 1 ? "s" : ""
+        }`;
+        outputWordCount.textContent = `${words} word${words !== 1 ? "s" : ""}`;
+      }
+
+      function convertCase(caseType) {
+        const text = inputText.value;
+        let convertedText = "";
+
+        switch (caseType) {
+          case "uppercase":
+            convertedText = text.toUpperCase();
+            break;
+          case "lowercase":
+            convertedText = text.toLowerCase();
+            break;
+          case "titlecase":
+            convertedText = text
+              .toLowerCase()
+              .replace(/\b\w/g, (char) => char.toUpperCase());
+            break;
+          case "sentencecase":
+            convertedText = text
+              .toLowerCase()
+              .replace(/(^\s*\w|[.!?]\s*\w)/g, (char) => char.toUpperCase());
+            break;
+          case "capitalize":
+            convertedText = text.replace(/\b\w/g, (char) => char.toUpperCase());
+            break;
+          case "invertcase":
+            convertedText = text
+              .split("")
+              .map((char) => {
+                return char === char.toUpperCase()
+                  ? char.toLowerCase()
+                  : char.toUpperCase();
+              })
+              .join("");
+            break;
+          default:
+            convertedText = text;
+        }
+
+        outputText.value = convertedText;
+        updateOutputStats();
+      }
+
+      function copyToClipboard() {
+        if (!outputText.value) {
+          alert("No converted text to copy");
+          return;
+        }
+
+        outputText.select();
+        document.execCommand("copy");
+
+        // Show temporary feedback
+        const copyBtn = document.querySelector("button.primary");
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Copied!
+            `;
+
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 2000);
+      }
+
+      function clearText() {
+        inputText.value = "";
+        outputText.value = "";
+        updateStats();
+        updateOutputStats();
+        inputText.focus();
+      }
+    </script>
+  </body>
+</html>

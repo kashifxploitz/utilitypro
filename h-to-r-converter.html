@@ -1,0 +1,594 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Converter - My Multi-Tool Website</title>
+    <style>
+      /* General Styles */
+      :root {
+        --primary-blue: #007bff; /* Bright Blue */
+        --secondary-blue: #e9f5ff; /* Lighter Blue for backgrounds */
+        --text-color: #333;
+        --border-color: #ccc;
+        --white: #fff;
+        --padding-base: 15px;
+        --margin-base: 20px;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background-color: var(--secondary-blue);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Align to top */
+        min-height: 100vh;
+        padding-top: var(--margin-base); /* Add some space at the top */
+        padding-bottom: var(--margin-base); /* Add space at the bottom */
+      }
+
+      .container {
+        background-color: var(--white);
+        padding: var(--margin-base);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 100%;
+        max-width: 500px; /* Slightly smaller max-width */
+        text-align: center;
+        margin-left: var(
+          --padding-base
+        ); /* Add horizontal margin for smaller screens */
+        margin-right: var(--padding-base);
+      }
+
+      h1 {
+        color: var(--primary-blue);
+        margin-bottom: 10px;
+      }
+
+      p {
+        margin-bottom: var(--margin-base);
+        color: #555;
+      }
+
+      /* Mode Toggle Styles */
+      .mode-toggle {
+        margin-bottom: var(--margin-base);
+        display: flex;
+        justify-content: center;
+        gap: 20px; /* Space between radio groups */
+        align-items: center;
+      }
+
+      .mode-toggle label {
+        font-weight: bold;
+        color: var(--text-color);
+        cursor: pointer;
+      }
+
+      .mode-toggle input[type="radio"] {
+        margin-right: 5px;
+      }
+
+      /* Input/Output Group Styles */
+      .input-group,
+      .output-group {
+        margin-bottom: var(--margin-base);
+        padding: var(--padding-base);
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        background-color: #f8f9fa; /* Light background */
+        text-align: left;
+      }
+
+      .input-group label,
+      .output-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: var(--text-color);
+        font-size: 0.95em;
+      }
+
+      /* Style for the single input/output text fields */
+      .input-group input[type="text"],
+      .output-group input[type="text"][readonly] {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-sizing: border-box;
+        font-size: 1rem;
+        font-family: inherit;
+        color: var(--text-color);
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+
+      .input-group input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+      }
+      .output-group input[type="text"][readonly] {
+        background-color: var(--white); /* Output fields are white */
+        cursor: text; /* Keep text cursor for copying */
+        border-color: #e9ecef; /* Lighter border */
+      }
+
+      /* Convert Button Styles */
+      #convertBtn {
+        display: block;
+        width: 100%;
+        padding: var(--padding-base);
+        background-color: var(--primary-blue);
+        color: var(--white);
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background-color 0.3s ease, opacity 0.3s ease;
+        margin-bottom: var(--margin-base);
+      }
+
+      #convertBtn:hover {
+        background-color: #0056b3;
+      }
+      #convertBtn:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+        opacity: 0.8;
+      }
+
+      /* Color Preview Area */
+      #colorPreview {
+        width: 100%;
+        height: 60px; /* Height for the color preview */
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        margin-top: var(--margin-base); /* Space above preview */
+        margin-bottom: var(--margin-base); /* Space below preview */
+        background-color: transparent; /* Default state */
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2);
+        transition: background-color 0.3s ease; /* Smooth color change */
+      }
+
+      /* Message Area */
+      #message {
+        color: #dc3545; /* Red for errors */
+        min-height: 1.2em;
+        margin-bottom: var(--margin-base); /* Space below message */
+        text-align: center;
+        font-size: 0.9em;
+      }
+
+      #message:empty {
+        min-height: 0; /* Collapse if empty */
+        margin-bottom: 0;
+        padding: 0;
+        border: none;
+      }
+
+      /* Optional Copy Button */
+      .copy-button-group {
+        display: flex;
+        justify-content: flex-end; /* Align to right */
+        margin-top: -10px; /* Pull up closer to inputs */
+        margin-bottom: var(--padding-base);
+        gap: 10px;
+      }
+
+      .copy-button {
+        padding: 6px 12px;
+        background-color: var(--white);
+        color: var(--primary-blue);
+        border: 1px solid var(--primary-blue);
+        border-radius: var(--border-radius);
+        font-size: 0.85em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .copy-button:hover {
+        background-color: var(--primary-blue);
+        color: var(--white);
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 600px) {
+        .container {
+          padding: var(--padding-base);
+          margin-left: var(--padding-base);
+          margin-right: var(--padding-base);
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .mode-toggle {
+          flex-direction: column; /* Stack radios */
+          gap: 10px;
+        }
+
+        .input-group input[type="text"],
+        .output-group input[type="text"][readonly],
+        #convertBtn {
+          font-size: 1rem;
+          padding: 12px;
+        }
+        #colorPreview {
+          height: 50px;
+        }
+        #message {
+          font-size: 0.85em;
+        }
+        .copy-button-group {
+          justify-content: center; /* Center buttons */
+          gap: 8px;
+        }
+        .copy-button {
+          font-size: 0.8em;
+          padding: 5px 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Color Converter</h1>
+      <p>Convert between HEX and RGB color formats.</p>
+
+      <div class="mode-toggle">
+        <div>
+          <input
+            type="radio"
+            id="modeHexToRgb"
+            name="mode"
+            value="hexToRgb"
+            checked
+          />
+          <label for="modeHexToRgb">HEX to RGB</label>
+        </div>
+        <div>
+          <input type="radio" id="modeRgbToHex" name="mode" value="rgbToHex" />
+          <label for="modeRgbToHex">RGB to HEX</label>
+        </div>
+      </div>
+
+      <div id="colorPreview"></div>
+
+      <div id="message"></div>
+
+      <div id="hexToRgbSection">
+        <div class="input-group">
+          <label for="hexInput">Enter HEX Code:</label>
+          <input type="text" id="hexInput" placeholder="#RRGGBB or RRGGBB" />
+        </div>
+        <button class="btn-primary" id="hexToRgbBtn">Convert to RGB</button>
+        <div class="output-group">
+          <label for="rgbOutput">RGB Output:</label>
+          <input
+            type="text"
+            id="rgbOutput"
+            readonly
+            placeholder="rgb(R, G, B)"
+          />
+        </div>
+        <div class="copy-button-group">
+          <button class="copy-button" data-copy-target="rgbOutput">
+            Copy RGB
+          </button>
+        </div>
+      </div>
+
+      <div id="rgbToHexSection" style="display: none">
+        <div class="input-group">
+          <label for="rgbInput">Enter RGB Value:</label>
+          <input
+            type="text"
+            id="rgbInput"
+            placeholder="R, G, B or rgb(R, G, B)"
+          />
+        </div>
+        <button class="btn-primary" id="rgbToHexBtn">Convert to HEX</button>
+        <div class="output-group">
+          <label for="hexOutput">HEX Output:</label>
+          <input type="text" id="hexOutput" readonly placeholder="#RRGGBB" />
+        </div>
+        <div class="copy-button-group">
+          <button class="copy-button" data-copy-target="hexOutput">
+            Copy HEX
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const modeRadios = document.querySelectorAll('input[name="mode"]');
+      const hexToRgbSection = document.getElementById("hexToRgbSection");
+      const rgbToHexSection = document.getElementById("rgbToHexSection");
+      const hexInput = document.getElementById("hexInput");
+      const rgbInput = document.getElementById("rgbInput");
+      const hexToRgbBtn = document.getElementById("hexToRgbBtn");
+      const rgbToHexBtn = document.getElementById("rgbToHexBtn");
+      const rgbOutput = document.getElementById("rgbOutput"); // Renamed from rgbOutputR/G/B for single field
+      const hexOutput = document.getElementById("hexOutput");
+      const colorPreview = document.getElementById("colorPreview");
+      const messageDiv = document.getElementById("message");
+      const copyButtons = document.querySelectorAll(".copy-button");
+
+      // Function to display messages (errors or feedback)
+      function displayMessage(message, type) {
+        messageDiv.textContent = message;
+        messageDiv.className = ""; // Clear previous classes
+        if (type === "error") {
+          messageDiv.classList.add("error");
+        }
+        /* No specific class for neutral messages */
+      }
+
+      // Function to clear messages
+      function clearMessage() {
+        messageDiv.textContent = "";
+        messageDiv.className = "";
+      }
+
+      // Function to update color preview
+      function updateColorPreview(colorString) {
+        /* Browser's background-color can usually parse both valid hex and rgb strings */
+        /* Using try/catch as a safeguard, though valid outputs should always work */
+        try {
+          colorPreview.style.backgroundColor = colorString;
+        } catch (e) {
+          console.error("Failed to set color preview:", e, colorString);
+          colorPreview.style.backgroundColor = "transparent"; /* Fallback */
+        }
+      }
+
+      // --- Conversion Functions ---
+
+      // Convert HEX to RGB
+      function hexToRgb(hex) {
+        // Remove # if present
+        hex = hex.replace(/^#/, "");
+
+        // Handle 3-digit hex (e.g., #123) -> expand to 6-digit (e.g., #112233)
+        if (hex.length === 3) {
+          hex = hex[0] + hex[0] + hex[1] + hex[1] + hex[2] + hex[2];
+        }
+
+        // Validate 6-digit hex format
+        if (!/^[0-9a-fA-F]{6}$/.test(hex)) {
+          return null; /* Invalid format */
+        }
+
+        // Parse hex values for R, G, B
+        const bigint = parseInt(hex, 16);
+        const r = (bigint >> 16) & 255;
+        const g = (bigint >> 8) & 255;
+        const b = bigint & 255;
+
+        return { r, g, b };
+      }
+
+      // Convert RGB to HEX
+      function rgbToHex(rgbString) {
+        /* Use a regex to capture R, G, B values from rgb(R, G, B) */
+        let match = rgbString.match(
+          /rgb\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*\)/i
+        );
+
+        let r, g, b;
+
+        if (match) {
+          /* Matched rgb(R, G, B) format */
+          r = parseInt(match[1], 10);
+          g = parseInt(match[2], 10);
+          b = parseInt(match[3], 10);
+        } else {
+          /* Try R, G, B format (comma and/or space separated) */
+          const parts = rgbString.split(/,|\s+/).filter((part) => part !== "");
+          if (parts.length === 3) {
+            r = parseInt(parts[0], 10);
+            g = parseInt(parts[1], 10);
+            b = parseInt(parts[2], 10);
+          } else {
+            return null; /* Invalid number of parts */
+          }
+        }
+
+        /* Validate R, G, B are numbers between 0 and 255 */
+        if (
+          isNaN(r) ||
+          isNaN(g) ||
+          isNaN(b) ||
+          r < 0 ||
+          r > 255 ||
+          g < 0 ||
+          g > 255 ||
+          b < 0 ||
+          b > 255
+        ) {
+          return null; /* Invalid RGB values */
+        }
+
+        /* Convert R, G, B to 2-digit hex */
+        const toHex = (c) => {
+          const hex = Math.round(c).toString(16); /* Round and convert */
+          return hex.length === 1
+            ? "0" + hex
+            : hex; /* Pad with leading zero if needed */
+        };
+
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      }
+
+      // --- UI Logic ---
+
+      // Function to switch between conversion modes
+      function switchMode(mode) {
+        if (mode === "hexToRgb") {
+          hexToRgbSection.style.display = "block";
+          rgbToHexSection.style.display = "none";
+        } else if (mode === "rgbToHex") {
+          hexToRgbSection.style.display = "none";
+          rgbToHexSection.style.display = "block";
+        }
+
+        /* Clear fields, message, and preview on mode switch */
+        hexInput.value = "";
+        rgbInput.value = "";
+        rgbOutput.value = "";
+        hexOutput.value = "";
+        updateColorPreview("transparent");
+        clearMessage();
+      }
+
+      // --- Event Handlers ---
+
+      // Handle HEX to RGB conversion button click
+      hexToRgbBtn.addEventListener("click", () => {
+        const hexValue =
+          hexInput.value.trim(); /* Get input and trim whitespace */
+
+        clearMessage(); /* Clear previous message */
+
+        if (hexValue === "") {
+          displayMessage("Please enter a HEX code.", ""); /* Neutral message */
+          updateColorPreview("transparent"); /* Reset preview */
+          rgbOutput.value = ""; /* Clear output */
+          return;
+        }
+
+        const rgb = hexToRgb(hexValue);
+
+        if (rgb) {
+          /* Conversion successful */
+          const rgbString = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+          rgbOutput.value = rgbString; /* Display result in RGB output field */
+          updateColorPreview(rgbString); /* Update color preview */
+          /* clearMessage(); // Message is already cleared */
+        } else {
+          /* Conversion failed */
+          displayMessage(
+            "Invalid HEX format. Please use #RRGGBB or #RGB.",
+            "error"
+          );
+          rgbOutput.value = ""; /* Clear output */
+          updateColorPreview("transparent"); /* Reset preview */
+        }
+      });
+
+      // Handle RGB to HEX conversion button click
+      rgbToHexBtn.addEventListener("click", () => {
+        const rgbValue =
+          rgbInput.value.trim(); /* Get input and trim whitespace */
+
+        clearMessage(); /* Clear previous message */
+
+        if (rgbValue === "") {
+          displayMessage(
+            "Please enter an RGB value.",
+            ""
+          ); /* Neutral message */
+          updateColorPreview("transparent"); /* Reset preview */
+          hexOutput.value = ""; /* Clear output */
+          return;
+        }
+
+        const hex = rgbToHex(rgbValue);
+
+        if (hex) {
+          /* Conversion successful */
+          hexOutput.value = hex; /* Display result in HEX output field */
+          updateColorPreview(hex); /* Update color preview */
+          /* clearMessage(); // Message is already cleared */
+        } else {
+          /* Conversion failed */
+          displayMessage(
+            "Invalid RGB format. Please use R, G, B (0-255) or rgb(R, G, B).",
+            "error"
+          );
+          hexOutput.value = ""; /* Clear output */
+          updateColorPreview("transparent"); /* Reset preview */
+        }
+      });
+
+      // Handle changes in the mode radio buttons
+      modeRadios.forEach((radio) => {
+        radio.addEventListener("change", (event) => {
+          switchMode(event.target.value);
+        });
+      });
+
+      // Handle Copy button clicks
+      copyButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const targetId = button.dataset.copyTarget;
+          const targetInput = document.getElementById(targetId);
+
+          if (targetInput && targetInput.value.trim() !== "") {
+            navigator.clipboard
+              .writeText(targetInput.value)
+              .then(() => {
+                displayMessage("Copied!", ""); /* Neutral message */
+                setTimeout(
+                  clearMessage,
+                  2000
+                ); /* Clear message after 2 seconds */
+              })
+              .catch((err) => {
+                console.error("Copy failed:", err);
+                displayMessage("Copy failed.", "error");
+              });
+          } else {
+            displayMessage("Nothing to copy.", ""); /* Neutral message */
+            setTimeout(clearMessage, 2000); /* Clear message after 2 seconds */
+          }
+        });
+      });
+
+      /* Optional: Clear message and preview when inputs change */
+      hexInput.addEventListener("input", () => {
+        clearMessage();
+        updateColorPreview("transparent"); /* Clear preview */
+        rgbOutput.value = ""; /* Clear output */
+      });
+
+      rgbInput.addEventListener("input", () => {
+        clearMessage();
+        updateColorPreview("transparent"); /* Clear preview */
+        hexOutput.value = ""; /* Clear output */
+      });
+
+      /* Optional: Allow pressing Enter key to trigger conversion */
+      hexInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault(); /* Prevent default form submission */
+          hexToRgbBtn.click(); /* Trigger HEX to RGB button click */
+        }
+      });
+
+      rgbInput.addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+          event.preventDefault(); /* Prevent default form submission */
+          rgbToHexBtn.click(); /* Trigger RGB to HEX button click */
+        }
+      });
+
+      /* --- Initialization --- */
+      /* Set initial mode on page load */
+      document.addEventListener("DOMContentLoaded", () => {
+        /* The HTML defaults to hexToRgb checked, so just ensure UI matches */
+        switchMode("hexToRgb");
+      });
+    </script>
+  </body>
+</html>

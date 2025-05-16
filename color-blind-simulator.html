@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Blindness Simulator - Multi-Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        flex: 1;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        color: #007bff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .tool-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      input[type="color"],
+      input[type="text"] {
+        padding: 5px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .color-inputs {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .color-input {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .preview {
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 1.2em;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+
+      .preview-box {
+        flex: 1;
+        min-width: 150px;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        text-align: center;
+      }
+
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+        margin-bottom: 10px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .password-group {
+        margin-bottom: 20px;
+      }
+
+      .password-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .output-group {
+        margin-top: 20px;
+      }
+
+      #output {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        min-height: 100px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background: #007bff;
+        color: #fff;
+        margin-top: auto;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .color-inputs {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        .preview {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Color Blindness Simulator</h1>
+        <p>
+          Simulate how colors appear to users with color vision deficiencies.
+        </p>
+      </header>
+
+      <section class="tool-section">
+        <div class="input-group">
+          <div class="color-inputs">
+            <div class="color-input">
+              <label for="inputColor">Select Color</label>
+              <input
+                type="color"
+                id="inputColor"
+                value="#007bff"
+                oninput="simulateColorBlindness()"
+              />
+              <input
+                type="text"
+                id="inputHex"
+                value="#007bff"
+                oninput="updateColor()"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="deficiencyType">Color Vision Deficiency</label>
+          <select id="deficiencyType" onchange="simulateColorBlindness()">
+            <option value="normal">Normal Vision</option>
+            <option value="protanopia">Protanopia (Red-Blind)</option>
+            <option value="deuteranopia">Deuteranopia (Green-Blind)</option>
+            <option value="tritanopia">Tritanopia (Blue-Blind)</option>
+            <option value="achromatopsia">Achromatopsia (Monochromacy)</option>
+          </select>
+        </div>
+
+        <div class="preview" id="preview">
+          <div class="preview-box" id="normalPreview">Normal Vision</div>
+          <div class="preview-box" id="protanopiaPreview">Protanopia</div>
+          <div class="preview-box" id="deuteranopiaPreview">Deuteranopia</div>
+          <div class="preview-box" id="tritanopiaPreview">Tritanopia</div>
+          <div class="preview-box" id="achromatopsiaPreview">Achromatopsia</div>
+        </div>
+
+        <div class="password-group">
+          <input
+            type="password"
+            id="password"
+            placeholder="Optional: Enter password to protect output file"
+          />
+        </div>
+
+        <button onclick="simulateColorBlindness()">Simulate</button>
+
+        <div class="output-group">
+          <div id="output"></div>
+          <button onclick="downloadOutput()" style="margin-top: 10px">
+            Download Results
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>© 2025 Multi-Tool Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function hexToRgb(hex) {
+        hex = hex.replace("#", "");
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return { r, g, b };
+      }
+
+      function rgbToHex(r, g, b) {
+        return `#${Math.round(r).toString(16).padStart(2, "0")}${Math.round(g)
+          .toString(16)
+          .padStart(2, "0")}${Math.round(b).toString(16).padStart(2, "0")}`;
+      }
+
+      function simulateProtanopia(r, g, b) {
+        // Simulate red-blindness (Protanopia)
+        const r_new = 0.567 * r + 0.433 * g;
+        const g_new = 0.558 * r + 0.442 * g;
+        const b_new = b;
+        return { r: r_new, g: g_new, b: b_new };
+      }
+
+      function simulateDeuteranopia(r, g, b) {
+        // Simulate green-blindness (Deuteranopia)
+        const r_new = 0.625 * r + 0.375 * g;
+        const g_new = 0.7 * r + 0.3 * g;
+        const b_new = b;
+        return { r: r_new, g: g_new, b: b_new };
+      }
+
+      function simulateTritanopia(r, g, b) {
+        // Simulate blue-blindness (Tritanopia)
+        const r_new = r;
+        const g_new = g;
+        const b_new = 0.95 * r + 0.05 * g;
+        return { r: r_new, g: g_new, b: b_new };
+      }
+
+      function simulateAchromatopsia(r, g, b) {
+        // Simulate monochromacy (Achromatopsia)
+        const gray = 0.299 * r + 0.587 * g + 0.114 * b;
+        return { r: gray, g: gray, b: gray };
+      }
+
+      function simulateColorBlindness() {
+        const hex = document.getElementById("inputHex").value;
+        const deficiencyType = document.getElementById("deficiencyType").value;
+        const output = document.getElementById("output");
+
+        if (!/^#[0-9A-F]{6}$/i.test(hex)) {
+          output.textContent =
+            "Please enter a valid hex color (e.g., #FFFFFF).";
+          return;
+        }
+
+        const rgb = hexToRgb(hex);
+        let results = `Color Blindness Simulation Results for ${hex}:\n\n`;
+
+        // Normal vision
+        document.getElementById("normalPreview").style.backgroundColor = hex;
+        results += `Normal Vision: ${hex}\n`;
+
+        // Protanopia
+        const protanopia = simulateProtanopia(rgb.r, rgb.g, rgb.b);
+        const protanopiaHex = rgbToHex(
+          protanopia.r,
+          protanopia.g,
+          protanopia.b
+        );
+        document.getElementById("protanopiaPreview").style.backgroundColor =
+          protanopiaHex;
+        results += `Protanopia (Red-Blind): ${protanopiaHex}\n`;
+
+        // Deuteranopia
+        const deuteranopia = simulateDeuteranopia(rgb.r, rgb.g, rgb.b);
+        const deuteranopiaHex = rgbToHex(
+          deuteranopia.r,
+          deuteranopia.g,
+          deuteranopia.b
+        );
+        document.getElementById("deuteranopiaPreview").style.backgroundColor =
+          deuteranopiaHex;
+        results += `Deuteranopia (Green-Blind): ${deuteranopiaHex}\n`;
+
+        // Tritanopia
+        const tritanopia = simulateTritanopia(rgb.r, rgb.g, rgb.b);
+        const tritanopiaHex = rgbToHex(
+          tritanopia.r,
+          tritanopia.g,
+          tritanopia.b
+        );
+        document.getElementById("tritanopiaPreview").style.backgroundColor =
+          tritanopiaHex;
+        results += `Tritanopia (Blue-Blind): ${tritanopiaHex}\n`;
+
+        // Achromatopsia
+        const achromatopsia = simulateAchromatopsia(rgb.r, rgb.g, rgb.b);
+        const achromatopsiaHex = rgbToHex(
+          achromatopsia.r,
+          achromatopsia.g,
+          achromatopsia.b
+        );
+        document.getElementById("achromatopsiaPreview").style.backgroundColor =
+          achromatopsiaHex;
+        results += `Achromatopsia (Monochromacy): ${achromatopsiaHex}\n`;
+
+        output.textContent = results;
+
+        // Update selected deficiency preview if not normal
+        if (deficiencyType !== "normal") {
+          const selectedHex = {
+            protanopia: protanopiaHex,
+            deuteranopia: deuteranopiaHex,
+            tritanopia: tritanopiaHex,
+            achromatopsia: achromatopsiaHex,
+          }[deficiencyType];
+          document.getElementById("normalPreview").style.backgroundColor =
+            selectedHex;
+        }
+      }
+
+      function updateColor() {
+        const hexInput = document.getElementById("inputHex");
+        const colorInput = document.getElementById("inputColor");
+        const hex = hexInput.value;
+
+        if (/^#[0-9A-F]{6}$/i.test(hex)) {
+          colorInput.value = hex;
+          simulateColorBlindness();
+        }
+      }
+
+      function downloadOutput() {
+        const output = document.getElementById("output").textContent;
+        const password = document.getElementById("password").value;
+
+        if (!output) {
+          alert("Please simulate a color first!");
+          return;
+        }
+
+        const blob = new Blob([output], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = password
+          ? "color_blindness_results_protected.txt"
+          : "color_blindness_results.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (password) {
+          alert(
+            "Note: Password protection is simulated for this demo. The file is not actually encrypted."
+          );
+        }
+      }
+
+      // Initial simulation
+      simulateColorBlindness();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Gradient Generator - Multi-Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        flex: 1;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        color: #007bff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .tool-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      input[type="color"],
+      input[type="number"],
+      select {
+        padding: 8px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+        margin-bottom: 10px;
+      }
+
+      input[type="color"] {
+        width: 100px;
+        height: 40px;
+        padding: 0;
+      }
+
+      .color-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        align-items: center;
+      }
+
+      .options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        flex: 1;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .password-group {
+        margin-bottom: 20px;
+      }
+
+      .password-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .preview {
+        width: 100%;
+        height: 150px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        background: linear-gradient(to right, #007bff, #fff);
+      }
+
+      .output-group {
+        margin-top: 20px;
+      }
+
+      #cssOutput {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        min-height: 100px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        font-family: "Courier New", monospace;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background: #007bff;
+        color: #fff;
+        margin-top: auto;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .options,
+        .color-group {
+          flex-direction: column;
+        }
+
+        input[type="color"] {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Gradient Generator</h1>
+        <p>Create beautiful CSS color gradients (linear, radial) with ease.</p>
+      </header>
+
+      <section class="tool-section">
+        <div class="input-group">
+          <label>Gradient Type</label>
+          <select id="gradientType" onchange="updateGradient()">
+            <option value="linear">Linear</option>
+            <option value="radial">Radial</option>
+          </select>
+        </div>
+
+        <div class="input-group">
+          <label>Colors</label>
+          <div class="color-group">
+            <input
+              type="color"
+              id="color1"
+              value="#007bff"
+              onchange="updateGradient()"
+            />
+            <input
+              type="color"
+              id="color2"
+              value="#ffffff"
+              onchange="updateGradient()"
+            />
+          </div>
+        </div>
+
+        <div class="options">
+          <div class="option">
+            <label for="direction">Direction (Linear, deg)</label>
+            <input
+              type="number"
+              id="direction"
+              value="90"
+              min="0"
+              max="360"
+              onchange="updateGradient()"
+            />
+          </div>
+          <div class="option">
+            <label for="shape">Shape (Radial)</label>
+            <select id="shape" onchange="updateGradient()">
+              <option value="circle">Circle</option>
+              <option value="ellipse">Ellipse</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="password-group">
+          <input
+            type="password"
+            id="password"
+            placeholder="Optional: Enter password to protect output file"
+          />
+        </div>
+
+        <div class="preview" id="preview"></div>
+
+        <button onclick="updateGradient()">Generate Gradient</button>
+
+        <div class="output-group">
+          <label>CSS Code</label>
+          <div id="cssOutput"></div>
+          <button onclick="downloadOutput()" style="margin-top: 10px">
+            Download CSS
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>© 2025 Multi-Tool Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function updateGradient() {
+        const gradientType = document.getElementById("gradientType").value;
+        const color1 = document.getElementById("color1").value;
+        const color2 = document.getElementById("color2").value;
+        const direction = document.getElementById("direction").value;
+        const shape = document.getElementById("shape").value;
+        const preview = document.getElementById("preview");
+        const cssOutput = document.getElementById("cssOutput");
+
+        let css = "";
+        if (gradientType === "linear") {
+          css = `background: linear-gradient(${direction}deg, ${color1}, ${color2});`;
+        } else {
+          css = `background: radial-gradient(${shape}, ${color1}, ${color2});`;
+        }
+
+        preview.style.background = css.replace("background: ", "");
+        cssOutput.textContent = css;
+      }
+
+      function downloadOutput() {
+        const cssOutput = document.getElementById("cssOutput").textContent;
+        const password = document.getElementById("password").value;
+
+        if (!cssOutput) {
+          alert("Please generate a gradient first!");
+          return;
+        }
+
+        const blob = new Blob([cssOutput], { type: "text/css" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = password ? "gradient_protected.css" : "gradient.css";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (password) {
+          alert(
+            "Note: Password protection is simulated for this demo. The file is not actually encrypted."
+          );
+        }
+      }
+
+      // Initial gradient generation
+      updateGradient();
+    </script>
+  </body>
+</html>

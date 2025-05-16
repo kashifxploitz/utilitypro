@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Image Rotator & Converter Tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        --primary: #2196f3;
+        --primary-light: #e3f2fd;
+        --white: #fff;
+        --gray: #f5f5f5;
+        --border: #d1eaff;
+        --radius: 18px;
+        --shadow: 0 4px 16px rgba(33, 150, 243, 0.07);
+      }
+      body {
+        background: var(--primary-light);
+        font-family: "Segoe UI", Arial, sans-serif;
+        color: #222;
+        margin: 0;
+        padding: 0;
+      }
+      .container {
+        max-width: 420px;
+        margin: 32px auto;
+        background: var(--white);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 2rem 1.5rem 2rem 1.5rem;
+        border: 1px solid var(--border);
+      }
+      h2 {
+        text-align: center;
+        color: var(--primary);
+        margin-bottom: 1.5rem;
+        letter-spacing: 1px;
+      }
+      .upload-label {
+        display: block;
+        background: var(--primary);
+        color: var(--white);
+        padding: 0.8em 1.2em;
+        border-radius: var(--radius);
+        text-align: center;
+        cursor: pointer;
+        margin-bottom: 1.2em;
+        font-weight: 500;
+        transition: background 0.2s;
+      }
+      .upload-label:hover {
+        background: #1976d2;
+      }
+      input[type="file"] {
+        display: none;
+      }
+      .preview-box {
+        background: var(--gray);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 220px;
+        margin-bottom: 1.2em;
+        overflow: hidden;
+        position: relative;
+      }
+      .preview-box img {
+        max-width: 100%;
+        max-height: 210px;
+        border-radius: 12px;
+        transition: transform 0.3s;
+        background: #e3f2fd;
+      }
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.8em;
+        justify-content: center;
+        margin-bottom: 1.2em;
+      }
+      .controls button,
+      .controls select {
+        background: var(--primary);
+        color: var(--white);
+        border: none;
+        border-radius: 8px;
+        padding: 0.6em 1em;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-weight: 500;
+      }
+      .controls button:hover,
+      .controls select:focus {
+        background: #1976d2;
+        outline: none;
+      }
+      .controls select {
+        background: var(--primary-light);
+        color: #222;
+        border: 1px solid var(--border);
+        min-width: 100px;
+      }
+      .download-btn {
+        width: 100%;
+        margin-top: 1em;
+        background: linear-gradient(90deg, #2196f3 60%, #64b5f6 100%);
+        color: var(--white);
+        border: none;
+        border-radius: var(--radius);
+        padding: 0.9em 0;
+        font-size: 1.1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.2s;
+        box-shadow: 0 2px 8px rgba(33, 150, 243, 0.11);
+      }
+      .download-btn:disabled {
+        background: #b3e5fc;
+        color: #90caf9;
+        cursor: not-allowed;
+      }
+      @media (max-width: 600px) {
+        .container {
+          padding: 1rem 0.5rem 1.5rem 0.5rem;
+        }
+        .controls {
+          flex-direction: column;
+          gap: 0.5em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Image Rotator & Converter</h2>
+      <label class="upload-label" for="imgInput">Upload Image</label>
+      <input type="file" id="imgInput" accept="image/*" />
+      <div class="preview-box" id="previewBox">
+        <span id="previewPlaceholder" style="color: #2196f3; opacity: 0.7"
+          >No image selected</span
+        >
+        <img id="imgPreview" style="display: none" alt="Preview" />
+      </div>
+      <div class="controls">
+        <button type="button" id="rotateLeft" title="Rotate Left 90°">
+          &#8634; Left
+        </button>
+        <button type="button" id="rotateRight" title="Rotate Right 90°">
+          &#8635; Right
+        </button>
+        <select id="formatSelect" title="Select format">
+          <option value="jpeg">JPG</option>
+          <option value="png">PNG</option>
+          <option value="webp">WEBP</option>
+        </select>
+        <select id="qualitySelect" title="Compression quality">
+          <option value="0.8">High</option>
+          <option value="0.5">Medium</option>
+          <option value="0.3">Low</option>
+        </select>
+      </div>
+      <button class="download-btn" id="downloadBtn" disabled>
+        Download Compressed Image
+      </button>
+    </div>
+
+    <script>
+      const imgInput = document.getElementById("imgInput");
+      const imgPreview = document.getElementById("imgPreview");
+      const previewBox = document.getElementById("previewBox");
+      const previewPlaceholder = document.getElementById("previewPlaceholder");
+      const rotateLeft = document.getElementById("rotateLeft");
+      const rotateRight = document.getElementById("rotateRight");
+      const formatSelect = document.getElementById("formatSelect");
+      const qualitySelect = document.getElementById("qualitySelect");
+      const downloadBtn = document.getElementById("downloadBtn");
+
+      let currentImage = null;
+      let rotation = 0;
+
+      imgInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (!file || !file.type.startsWith("image/")) {
+          imgPreview.style.display = "none";
+          previewPlaceholder.style.display = "";
+          downloadBtn.disabled = true;
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (evt) {
+          imgPreview.src = evt.target.result;
+          imgPreview.style.display = "";
+          previewPlaceholder.style.display = "none";
+          currentImage = new Image();
+          currentImage.onload = function () {
+            rotation = 0;
+            imgPreview.style.transform = `rotate(0deg)`;
+            downloadBtn.disabled = false;
+          };
+          currentImage.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      function updatePreviewRotation() {
+        imgPreview.style.transform = `rotate(${rotation}deg)`;
+      }
+
+      rotateLeft.addEventListener("click", function () {
+        if (!currentImage) return;
+        rotation = (rotation - 90) % 360;
+        updatePreviewRotation();
+      });
+
+      rotateRight.addEventListener("click", function () {
+        if (!currentImage) return;
+        rotation = (rotation + 90) % 360;
+        updatePreviewRotation();
+      });
+
+      downloadBtn.addEventListener("click", function () {
+        if (!currentImage) return;
+        // Create canvas
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        let angle = (rotation * Math.PI) / 180;
+        let w = currentImage.width,
+          h = currentImage.height;
+        let cw = w,
+          ch = h;
+        // Adjust canvas size for rotation
+        if (rotation % 180 !== 0) {
+          cw = h;
+          ch = w;
+        }
+        canvas.width = cw;
+        canvas.height = ch;
+        // Move to center and rotate
+        ctx.save();
+        ctx.translate(cw / 2, ch / 2);
+        ctx.rotate(angle);
+        ctx.drawImage(currentImage, -w / 2, -h / 2);
+        ctx.restore();
+        // Get format and quality
+        let format = formatSelect.value;
+        let quality = parseFloat(qualitySelect.value);
+        let mimeType = "image/jpeg";
+        if (format === "png") mimeType = "image/png";
+        if (format === "webp") mimeType = "image/webp";
+        canvas.toBlob(
+          function (blob) {
+            const link = document.createElement("a");
+            link.download = `converted-image.${format}`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+            URL.revokeObjectURL(link.href);
+          },
+          mimeType,
+          quality
+        );
+      });
+
+      // Accessibility: Disable controls if no image
+      function setControlsState(enabled) {
+        rotateLeft.disabled = !enabled;
+        rotateRight.disabled = !enabled;
+        formatSelect.disabled = !enabled;
+        qualitySelect.disabled = !enabled;
+        downloadBtn.disabled = !enabled;
+      }
+      setControlsState(false);
+
+      imgInput.addEventListener("change", function (e) {
+        setTimeout(() => {
+          setControlsState(!!currentImage);
+        }, 200);
+      });
+    </script>
+  </body>
+</html>

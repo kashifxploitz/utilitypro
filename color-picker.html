@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Color Picker - My Multi-Tool Website</title>
+    <style>
+      /* General Styles */
+      :root {
+        --primary-blue: #007bff; /* Bright Blue */
+        --secondary-blue: #e9f5ff; /* Lighter Blue for backgrounds */
+        --text-color: #333;
+        --border-color: #ccc;
+        --white: #fff;
+        --padding-base: 15px;
+        --margin-base: 20px;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        --picker-width: 300px; /* Base size for the picker area */
+        --picker-height: 200px;
+        --handle-size: 16px;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background-color: var(--secondary-blue);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Align to top */
+        min-height: 100vh;
+        padding-top: var(--margin-base); /* Add some space at the top */
+        padding-bottom: var(--margin-base); /* Add space at the bottom */
+      }
+
+      .container {
+        background-color: var(--white);
+        padding: var(--margin-base);
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        width: 100%;
+        max-width: 550px; /* Adjust max-width for picker layout */
+        text-align: center;
+        margin-left: var(
+          --padding-base
+        ); /* Add horizontal margin for smaller screens */
+        margin-right: var(--padding-base);
+      }
+
+      h1 {
+        color: var(--primary-blue);
+        margin-bottom: 10px;
+      }
+
+      p {
+        margin-bottom: var(--margin-base);
+        color: #555;
+      }
+
+      /* Color Display Area */
+      #selectedColorDisplay {
+        width: 100%;
+        height: 80px; /* Height for the color preview */
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        margin-bottom: var(--margin-base);
+        background-color: #007bff; /* Default color */
+        box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.2); /* Subtle inner shadow */
+      }
+
+      /* Picker Area Layout (Flexbox) */
+      .picker-area {
+        display: flex;
+        gap: var(--padding-base); /* Space between color area and slider */
+        margin-bottom: var(--margin-base);
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+        justify-content: center;
+      }
+
+      /* Saturation/Value Area (Main Color Square) */
+      #saturationValueArea {
+        width: var(--picker-width);
+        height: var(--picker-height);
+        position: relative; /* Needed for handle positioning */
+        border-radius: var(--border-radius);
+        overflow: hidden; /* Hide handle if it goes outside */
+        cursor: crosshair;
+        /* CSS Gradients for HSV Saturation (left-right) and Value (top-bottom) */
+        background-image: linear-gradient(
+            to right,
+            white,
+            rgba(255, 255, 255, 0)
+          ),
+          /* Saturation */ linear-gradient(to top, black, rgba(0, 0, 0, 0)); /* Value */
+        background-color: hsl(
+          0,
+          100%,
+          50%
+        ); /* Base Hue color (Red initially) - set by JS */
+      }
+
+      /* Hue Slider Area */
+      #hueSliderArea {
+        width: calc(var(--handle-size) * 1.5); /* Width based on handle size */
+        height: var(--picker-height);
+        position: relative; /* Needed for handle positioning */
+        border-radius: var(--border-radius);
+        overflow: hidden; /* Hide handle if it goes outside */
+        cursor: pointer;
+        /* CSS Gradient for Hue */
+        background: linear-gradient(
+          to bottom,
+          hsl(0, 100%, 50%),
+          /* Red */ hsl(60, 100%, 50%),
+          /* Yellow */ hsl(120, 100%, 50%),
+          /* Green */ hsl(180, 100%, 50%),
+          /* Cyan */ hsl(240, 100%, 50%),
+          /* Blue */ hsl(300, 100%, 50%),
+          /* Magenta */ hsl(360, 100%, 50%) /* Red (wrap) */
+        );
+      }
+
+      /* Draggable Handle Styles */
+      .picker-handle {
+        width: var(--handle-size);
+        height: var(--handle-size);
+        border: 2px solid var(--white);
+        border-radius: 50%; /* Circular handle */
+        position: absolute;
+        box-sizing: border-box;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+        cursor: grab;
+        z-index: 2; /* Ensure handle is above gradients */
+      }
+
+      #saturationValueHandle {
+        /* Position relative to top-left of saturationValueArea */
+        top: calc(100% - var(--handle-size) / 2); /* Default bottom (Value 0) */
+        left: calc(var(--handle-size) / 2); /* Default left (Saturation 0) */
+      }
+
+      #hueSliderHandle {
+        /* Position relative to top-left of hueSliderArea */
+        left: 50%; /* Center horizontally */
+        transform: translateX(-50%); /* Adjust for center positioning */
+        top: calc(var(--handle-size) / 2); /* Default top (Hue 0) */
+      }
+
+      /* Color Value Display */
+      .color-values {
+        display: grid;
+        grid-template-columns: repeat(
+          auto-fit,
+          minmax(150px, 1fr)
+        ); /* Responsive columns */
+        gap: var(--padding-base);
+        margin-bottom: var(--margin-base);
+      }
+
+      .color-value-item {
+        text-align: left;
+        /* Or text-align: center; depending on desired layout */
+      }
+
+      .color-value-item label {
+        display: block;
+        font-weight: bold;
+        margin-bottom: 5px;
+        color: var(--text-color);
+        font-size: 0.95em;
+      }
+
+      .color-value-item input[type="text"] {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: var(--border-radius);
+        box-sizing: border-box;
+        font-size: 1rem;
+        font-family: inherit;
+        color: var(--text-color);
+        background-color: #f8f9fa; /* Readonly appearance */
+        cursor: text;
+      }
+      .color-value-item input[type="text"]:focus {
+        outline: none;
+        border-color: var(--primary-blue); /* Still highlight on focus */
+        box-shadow: 0 0 0 0.1rem rgba(0, 123, 255, 0.15);
+      }
+      .color-value-item input[type="text"][readonly] {
+        /* No special style needed if using background-color */
+      }
+
+      /* Copy Buttons */
+      .copy-button-group {
+        display: flex;
+        justify-content: flex-end; /* Align to right */
+        margin-top: -10px; /* Pull up closer to inputs */
+        margin-bottom: var(--padding-base);
+        gap: 10px;
+      }
+
+      .copy-button {
+        padding: 6px 12px;
+        background-color: var(--white);
+        color: var(--primary-blue);
+        border: 1px solid var(--primary-blue);
+        border-radius: var(--border-radius);
+        font-size: 0.85em;
+        cursor: pointer;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .copy-button:hover {
+        background-color: var(--primary-blue);
+        color: var(--white);
+      }
+
+      /* Message Area */
+      #message {
+        min-height: 1.2em;
+        margin-bottom: var(--margin-base);
+        text-align: center;
+        font-size: 0.9em;
+        color: #28a745; /* Green for success */
+      }
+      #message:empty {
+        min-height: 0;
+        margin-bottom: 0;
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 600px) {
+        .container {
+          padding: var(--padding-base);
+          margin-left: var(--padding-base);
+          margin-right: var(--padding-base);
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .picker-area {
+          flex-direction: column; /* Stack picker elements */
+          gap: 10px;
+          align-items: center; /* Center stacked items */
+        }
+
+        #saturationValueArea {
+          width: 100%; /* Full width when stacked */
+          max-width: var(--picker-width); /* Keep max-width */
+          height: calc(
+            var(--picker-width) * 0.66
+          ); /* Maintain aspect ratio roughly */
+        }
+        #hueSliderArea {
+          width: calc(var(--handle-size) * 1.5); /* Keep slider width */
+          height: calc(
+            var(--picker-width) * 0.66
+          ); /* Match height to Sat/Val area */
+        }
+
+        .color-values {
+          grid-template-columns: 1fr; /* Stack color value inputs */
+          gap: 10px;
+        }
+        .color-value-item input[type="text"] {
+          font-size: 0.95rem;
+          padding: 6px 8px;
+        }
+        .copy-button-group {
+          justify-content: center; /* Center copy buttons */
+          gap: 8px;
+        }
+        .copy-button {
+          font-size: 0.8em;
+          padding: 5px 10px;
+        }
+        #message {
+          font-size: 0.85em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Color Picker</h1>
+      <p>Pick a color visually and get its values in HEX, RGB, and HSL.</p>
+
+      <div id="selectedColorDisplay"></div>
+
+      <div class="picker-area">
+        <div id="saturationValueArea">
+          <div id="saturationValueHandle" class="picker-handle"></div>
+        </div>
+        <div id="hueSliderArea">
+          <div id="hueSliderHandle" class="picker-handle"></div>
+        </div>
+      </div>
+
+      <div class="copy-button-group">
+        <button class="copy-button" data-copy="hex">Copy HEX</button>
+        <button class="copy-button" data-copy="rgb">Copy RGB</button>
+        <button class="copy-button" data-copy="hsl">Copy HSL</button>
+      </div>
+
+      <div id="message"></div>
+      <div class="color-values">
+        <div class="color-value-item">
+          <label for="hexValue">HEX:</label>
+          <input type="text" id="hexValue" readonly value="#007bff" />
+        </div>
+        <div class="color-value-item">
+          <label for="rgbValue">RGB:</label>
+          <input type="text" id="rgbValue" readonly value="rgb(0, 123, 255)" />
+        </div>
+        <div class="color-value-item">
+          <label for="hslValue">HSL:</label>
+          <input
+            type="text"
+            id="hslValue"
+            readonly
+            value="hsl(210, 100%, 50%)"
+          />
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const selectedColorDisplay = document.getElementById(
+        "selectedColorDisplay"
+      );
+      const saturationValueArea = document.getElementById(
+        "saturationValueArea"
+      );
+      const saturationValueHandle = document.getElementById(
+        "saturationValueHandle"
+      );
+      const hueSliderArea = document.getElementById("hueSliderArea");
+      const hueSliderHandle = document.getElementById("hueSliderHandle");
+      const hexValueInput = document.getElementById("hexValue");
+      const rgbValueInput = document.getElementById("rgbValue");
+      const hslValueInput = document.getElementById("hslValue");
+      const copyButtons = document.querySelectorAll(".copy-button");
+      const messageDiv = document.getElementById("message");
+
+      let currentH = 210; // Default Hue (matches --primary-blue)
+      let currentS = 1; // Default Saturation
+      let currentV = 1; // Default Value (HSV)
+
+      let isDraggingHue = false;
+      let isDraggingSV = false;
+
+      // --- Color Conversion Functions (HSV, RGB, HSL, HEX) ---
+      // These are standard algorithms
+
+      function hsvToRgb(h, s, v) {
+        h /= 360; // h from 0-360 to 0-1
+        let r, g, b;
+        let i = Math.floor(h * 6);
+        let f = h * 6 - i;
+        let p = v * (1 - s);
+        let q = v * (1 - f * s);
+        let t = v * (1 - (1 - f) * s);
+        switch (i % 6) {
+          case 0:
+            r = v;
+            g = t;
+            b = p;
+            break;
+          case 1:
+            r = q;
+            g = v;
+            b = p;
+            break;
+          case 2:
+            r = p;
+            g = v;
+            b = t;
+            break;
+          case 3:
+            r = p;
+            g = q;
+            b = v;
+            break;
+          case 4:
+            r = t;
+            g = p;
+            b = v;
+            break;
+          case 5:
+            r = v;
+            g = p;
+            b = q;
+            break;
+        }
+        return {
+          r: Math.round(r * 255),
+          g: Math.round(g * 255),
+          b: Math.round(b * 255),
+        };
+      }
+
+      function rgbToHex(r, g, b) {
+        const toHex = (c) => {
+          const hex = c.toString(16);
+          return hex.length === 1 ? "0" + hex : hex;
+        };
+        return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+      }
+
+      function rgbToHsl(r, g, b) {
+        r /= 255;
+        g /= 255;
+        b /= 255;
+        const max = Math.max(r, g, b);
+        const min = Math.min(r, g, b);
+        let h,
+          s,
+          l = (max + min) / 2;
+
+        if (max === min) {
+          h = s = 0; // achromatic
+        } else {
+          const d = max - min;
+          s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+          switch (max) {
+            case r:
+              h = (g - b) / d + (g < b ? 6 : 0);
+              break;
+            case g:
+              h = (b - r) / d + 2;
+              break;
+            case b:
+              h = (r - g) / d + 4;
+              break;
+          }
+          h /= 6;
+        }
+        return {
+          h: Math.round(h * 360),
+          s: Math.round(s * 100),
+          l: Math.round(l * 100),
+        };
+      }
+
+      // Function to update all displays based on current HSV state
+      function updatePickerDisplay() {
+        // Update Sat/Val area background based on current Hue (at max S and V)
+        const baseRgbForSVArea = hsvToRgb(currentH, 1, 1);
+        saturationValueArea.style.backgroundColor = `rgb(${baseRgbForSVArea.r}, ${baseRgbForSVArea.g}, ${baseRgbForSVArea.b})`;
+
+        // Get RGB from current HSV state
+        const rgb = hsvToRgb(currentH, currentS, currentV);
+
+        // Get HEX from RGB
+        const hex = rgbToHex(rgb.r, rgb.g, rgb.b);
+
+        // Get HSL from RGB
+        const hsl = rgbToHsl(rgb.r, rgb.g, rgb.b);
+
+        // Update visual color display
+        selectedColorDisplay.style.backgroundColor = hex;
+
+        // Update value inputs
+        hexValueInput.value = hex;
+        rgbValueInput.value = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+        hslValueInput.value = `hsl(${hsl.h}, ${hsl.s}%, ${hsl.l}%)`;
+
+        // Position handles
+        // Hue handle: vertical position based on currentH (0-360)
+        const hueHandleY = (currentH / 360) * hueSliderArea.offsetHeight;
+        hueSliderHandle.style.top = `${
+          hueHandleY - hueSliderHandle.offsetHeight / 2
+        }px`;
+
+        // Sat/Val handle: horizontal based on currentS (0-1), vertical based on currentV (0-1)
+        const svHandleX = currentS * saturationValueArea.offsetWidth;
+        const svHandleY = (1 - currentV) * saturationValueArea.offsetHeight; // Value 1 (bright) is at the top (Y=0), Value 0 (dark) is at the bottom (Y=height)
+        saturationValueHandle.style.left = `${
+          svHandleX - saturationValueHandle.offsetWidth / 2
+        }px`;
+        saturationValueHandle.style.top = `${
+          svHandleY - saturationValueHandle.offsetHeight / 2
+        }px`;
+
+        // Update handle color for visibility against background
+        const handleLuminance =
+          (rgb.r * 0.299 + rgb.g * 0.587 + rgb.b * 0.114) / 255;
+        const handleColor = handleLuminance > 0.5 ? "#333" : "#fff"; // Dark or light border based on picked color brightness
+        saturationValueHandle.style.borderColor = handleColor;
+        // Hue handle color can be static or based on the picked color too, but border-color is set by CSS default
+      }
+
+      // --- Event Handling (Dragging) ---
+
+      function startDrag(event, handleType) {
+        if (handleType === "hue") {
+          isDraggingHue = true;
+          hueSliderHandle.style.cursor = "grabbing";
+        } else if (handleType === "sv") {
+          isDraggingSV = true;
+          saturationValueHandle.style.cursor = "grabbing";
+        }
+        // Prevent default to avoid selecting text etc.
+        event.preventDefault();
+        // Add listeners to the whole document to handle dragging outside the initial element
+        document.addEventListener("mousemove", onDrag);
+        document.addEventListener("mouseup", stopDrag);
+        document.addEventListener("touchmove", onDrag);
+        document.addEventListener("touchend", stopDrag);
+      }
+
+      function onDrag(event) {
+        // Use clientX/Y for mouse, or touch[0].clientX/Y for touch
+        const clientX = event.clientX || event.touches[0].clientX;
+        const clientY = event.clientY || event.touches[0].clientY;
+
+        if (isDraggingHue) {
+          const sliderRect = hueSliderArea.getBoundingClientRect();
+          let newY = clientY - sliderRect.top; // Y relative to the slider top
+
+          // Clamp Y position within the slider bounds
+          newY = Math.max(0, Math.min(newY, sliderRect.height));
+
+          // Map Y position to Hue (0-360)
+          currentH = (newY / sliderRect.height) * 360;
+
+          updatePickerDisplay();
+        } else if (isDraggingSV) {
+          const svRect = saturationValueArea.getBoundingClientRect();
+          let newX = clientX - svRect.left; // X relative to SV area left
+          let newY = clientY - svRect.top; // Y relative to SV area top
+
+          // Clamp X and Y positions within the SV area bounds
+          newX = Math.max(0, Math.min(newX, svRect.width));
+          newY = Math.max(0, Math.min(newY, svRect.height));
+
+          // Map X position to Saturation (0-1)
+          currentS = newX / svRect.width;
+
+          // Map Y position to Value (0-1) - Note: Value 1 is at the top (Y=0)
+          currentV = 1 - newY / svRect.height; // Invert Y mapping for Value
+
+          updatePickerDisplay();
+        }
+      }
+
+      function stopDrag() {
+        isDraggingHue = false;
+        isDraggingSV = false;
+        hueSliderHandle.style.cursor = "grab";
+        saturationValueHandle.style.cursor = "grab";
+        // Remove listeners from the document
+        document.removeEventListener("mousemove", onDrag);
+        document.removeEventListener("mouseup", stopDrag);
+        document.removeEventListener("touchmove", onDrag);
+        document.removeEventListener("touchend", stopDrag);
+      }
+
+      // Attach mousedown/touchstart listeners to the handles
+      hueSliderHandle.addEventListener("mousedown", (e) => startDrag(e, "hue"));
+      hueSliderHandle.addEventListener("touchstart", (e) =>
+        startDrag(e, "hue")
+      );
+
+      saturationValueHandle.addEventListener("mousedown", (e) =>
+        startDrag(e, "sv")
+      );
+      saturationValueHandle.addEventListener("touchstart", (e) =>
+        startDrag(e, "sv")
+      );
+
+      // Also allow clicking on the areas to jump the handle
+      hueSliderArea.addEventListener("mousedown", (e) => startDrag(e, "hue"));
+      hueSliderArea.addEventListener("touchstart", (e) => startDrag(e, "hue"));
+
+      saturationValueArea.addEventListener("mousedown", (e) =>
+        startDrag(e, "sv")
+      );
+      saturationValueArea.addEventListener("touchstart", (e) =>
+        startDrag(e, "sv")
+      );
+
+      // --- Copy Button Logic ---
+      function displayCopyMessage(message) {
+        messageDiv.textContent = message;
+        // Clear message after a few seconds
+        setTimeout(() => {
+          messageDiv.textContent = "";
+        }, 2000); // Message visible for 2 seconds
+      }
+
+      copyButtons.forEach((button) => {
+        button.addEventListener("click", () => {
+          const format = button.dataset.copy; // Get format from data attribute
+          let textToCopy = "";
+
+          if (format === "hex") {
+            textToCopy = hexValueInput.value;
+          } else if (format === "rgb") {
+            textToCopy = rgbValueInput.value;
+          } else if (format === "hsl") {
+            textToCopy = hslValueInput.value;
+          }
+
+          if (textToCopy) {
+            navigator.clipboard
+              .writeText(textToCopy)
+              .then(() => {
+                displayCopyMessage(`${format.toUpperCase()} copied!`);
+              })
+              .catch((err) => {
+                console.error("Failed to copy:", err);
+                displayCopyMessage("Copy failed.");
+              });
+          }
+        });
+      });
+
+      // --- Initialization ---
+      // Set initial picker state and display values
+      document.addEventListener("DOMContentLoaded", () => {
+        // Set initial position of handles based on default H,S,V
+        // Default is set in JS variables, updateDisplay will position handles and set outputs
+        updatePickerDisplay();
+      });
+    </script>
+  </body>
+</html>

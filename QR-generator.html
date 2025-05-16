@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>QR & Barcode Generator - Your Multi-Tool Website</title>
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <style>
+      /* Basic Reset and Body Styling */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f6; /* Light grey background */
+        color: #333; /* Dark grey text */
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 15px; /* Padding on sides for mobile */
+      }
+
+      /* Header Styling */
+      header {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2em;
+      }
+
+      /* Tool Section Styling */
+      .tool-section {
+        background-color: #fff; /* White background */
+        padding: 25px;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .tool-section h2 {
+        color: #1e88e5; /* Bright Blue */
+        margin-top: 0;
+        border-bottom: 2px solid #e0e0e0; /* Light grey border */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Form Styling */
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      input[type="text"],
+      textarea,
+      select,
+      input[type="number"],
+      input[type="color"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Include padding and border in element's total width and height */
+        font-size: 1em;
+      }
+
+      select {
+        /* Add arrow customization if needed, but default is fine */
+        appearance: menulist;
+      }
+
+      button {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        margin-top: 10px; /* Space above button */
+      }
+
+      button:hover {
+        background-color: #1565c0; /* Darker Blue on hover */
+      }
+
+      button:disabled {
+        background-color: #b0bec5; /* Grey when disabled */
+        cursor: not-allowed;
+      }
+
+      /* Conditional Settings Area */
+      .settings-group {
+        /* Use a class for both */
+        margin-top: 15px;
+        padding: 15px;
+        background-color: #e3f2fd; /* Light blue background for settings */
+        border: 1px solid #90caf9; /* Lighter blue border */
+        border-radius: 4px;
+      }
+
+      .settings-group .form-group {
+        margin-bottom: 10px; /* Smaller margin within settings */
+      }
+
+      .settings-group .form-group:last-child {
+        margin-bottom: 0;
+      }
+
+      .settings-group p {
+        font-size: 0.9em;
+        color: #555;
+        margin-top: 5px;
+        margin-bottom: 5px;
+      }
+
+      /* Output Area Styling */
+      #outputArea {
+        margin-top: 30px;
+        padding-top: 20px;
+        border-top: 2px solid #e0e0e0; /* Light grey border */
+        text-align: center; /* Center the generated code */
+      }
+
+      #outputArea h3 {
+        color: #1e88e5; /* Bright Blue */
+        margin-bottom: 15px;
+      }
+
+      #generatedCodeContainer {
+        margin: 20px auto; /* Center the container */
+        padding: 10px;
+        background-color: #fff;
+        border: 1px solid #eee;
+        display: inline-block; /* Shrink to content */
+        max-width: 100%; /* Prevent overflow */
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      #generatedCodeContainer canvas,
+      #generatedCodeContainer img {
+        display: block; /* Remove extra space below image/canvas */
+        max-width: 100%; /* Ensure responsiveness within container */
+        height: auto; /* Maintain aspect ratio */
+        margin: 0 auto; /* Center the element itself */
+      }
+
+      #downloadLink {
+        display: inline-block; /* Or block */
+        margin-top: 20px;
+        background-color: #4caf50; /* Green for download */
+        color: white;
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+      }
+
+      #downloadLink:hover {
+        background-color: #388e3c; /* Darker green */
+      }
+
+      #errorMessage {
+        margin-top: 20px;
+        padding: 15px; /* Increased padding */
+        background-color: #ffebee; /* Light red */
+        border: 1px solid #ef9a9a; /* Lighter red border */
+        color: #c62828; /* Dark red text */
+        border-radius: 4px;
+        display: none; /* Hidden by default */
+        font-weight: bold; /* Make text bold */
+        text-align: center; /* Center error text */
+      }
+
+      /* Responsive Design */
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.5em;
+        }
+
+        .tool-section {
+          padding: 15px;
+        }
+
+        button {
+          width: 100%; /* Full width buttons on small screens */
+        }
+
+        input[type="text"],
+        textarea,
+        select,
+        input[type="number"],
+        input[type="color"] {
+          font-size: 0.95em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>QR & Barcode Generator</h1>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="tool-section">
+        <h2>Create Your Code</h2>
+
+        <div class="form-group">
+          <label for="codeType">Select Code Type:</label>
+          <select id="codeType">
+            <option value="qr">QR Code</option>
+            <option value="barcode">Barcode (Linear)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="codeData">Enter Data:</label>
+          <textarea
+            id="codeData"
+            rows="4"
+            placeholder="Enter text, URL, etc."
+          ></textarea>
+        </div>
+
+        <div id="qrSettings" class="settings-group">
+          <div class="form-group">
+            <label for="qrSize">Size (pixels):</label>
+            <input type="number" id="qrSize" value="200" min="50" max="1000" />
+          </div>
+          <div class="form-group">
+            <label for="qrColorDark">Color (Dark Dots):</label>
+            <input type="color" id="qrColorDark" value="#000000" />
+          </div>
+          <div class="form-group">
+            <label for="qrColorLight">Color (Light Area):</label>
+            <input type="color" id="qrColorLight" value="#ffffff" />
+          </div>
+          <p>QR codes can encode most text data, URLs, etc.</p>
+        </div>
+
+        <div id="barcodeSettings" class="settings-group" style="display: none">
+          <div class="form-group">
+            <label for="barcodeFormat">Barcode Format:</label>
+            <select id="barcodeFormat">
+              <option value="auto">Auto</option>
+              <option value="CODE39">Code 39</option>
+              <option value="CODE128">Code 128</option>
+              <option value="EAN13">EAN 13</option>
+              <option value="EAN8">EAN 8</option>
+              <option value="UPC">UPC (UPC-A)</option>
+              <option value="pharmacode">Pharmacode</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="barcodeHeight">Height (pixels):</label>
+            <input
+              type="number"
+              id="barcodeHeight"
+              value="60"
+              min="10"
+              max="300"
+            />
+          </div>
+          <div class="form-group">
+            <label for="barcodeDisplayValue">Show Value Below Barcode:</label>
+            <select id="barcodeDisplayValue">
+              <option value="true">Yes</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="barcodeLineColor">Line Color:</label>
+            <input type="color" id="barcodeLineColor" value="#000000" />
+          </div>
+          <div class="form-group">
+            <label for="barcodeTextColor">Text Color:</label>
+            <input type="color" id="barcodeTextColor" value="#000000" />
+          </div>
+          <div class="form-group">
+            <label for="barcodeBackground">Background Color:</label>
+            <input type="color" id="barcodeBackground" value="#ffffff" />
+          </div>
+          <div class="form-group">
+            <label for="barcodeMargin">Margin:</label>
+            <input
+              type="number"
+              id="barcodeMargin"
+              value="10"
+              min="0"
+              max="50"
+            />
+          </div>
+          <p>Note: Barcode formats have specific data requirements:</p>
+          <ul>
+            <li>
+              EAN/UPC formats require only digits (EAN13: 12 or 13 digits, EAN8:
+              7 or 8 digits, UPC-A: 11 or 12 digits).
+            </li>
+            <li>
+              Code 39 supports uppercase letters, digits 0-9, and symbols (- . $
+              / + % space).
+            </li>
+            <li>
+              Code 128 is more flexible, supporting the full ASCII 128 character
+              set.
+            </li>
+            <li>'Auto' attempts to detect the best format.</li>
+          </ul>
+        </div>
+
+        <button id="generateCodeBtn">Generate Code</button>
+
+        <div id="errorMessage" style="display: none"></div>
+
+        <div id="outputArea" style="display: none">
+          <h3>Generated Code</h3>
+          <div id="generatedCodeContainer"></div>
+          <a id="downloadLink" href="#" download="generated_code.png"
+            >Download Code</a
+          >
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // This script relies on the JsBarcode and QRCode libraries loaded via the CDN links in the <head>.
+
+      const codeTypeSelect = document.getElementById("codeType");
+      const codeDataInput = document.getElementById("codeData");
+      const qrSettingsDiv = document.getElementById("qrSettings");
+      const barcodeSettingsDiv = document.getElementById("barcodeSettings");
+      const generateCodeBtn = document.getElementById("generateCodeBtn");
+      const outputAreaDiv = document.getElementById("outputArea");
+      const generatedCodeContainerDiv = document.getElementById(
+        "generatedCodeContainer"
+      );
+      const downloadLink = document.getElementById("downloadLink");
+      const errorMessageDiv = document.getElementById("errorMessage");
+
+      // QR Settings Inputs
+      const qrSizeInput = document.getElementById("qrSize");
+      const qrColorDarkInput = document.getElementById("qrColorDark");
+      const qrColorLightInput = document.getElementById("qrColorLight");
+
+      // Barcode Settings Inputs
+      const barcodeFormatSelect = document.getElementById("barcodeFormat");
+      const barcodeHeightInput = document.getElementById("barcodeHeight");
+      const barcodeDisplayValueSelect = document.getElementById(
+        "barcodeDisplayValue"
+      );
+      const barcodeLineColorInput = document.getElementById("barcodeLineColor");
+      const barcodeTextColorInput = document.getElementById("barcodeTextColor");
+      const barcodeBackgroundInput =
+        document.getElementById("barcodeBackground");
+      const barcodeMarginInput = document.getElementById("barcodeMargin");
+
+      // Function to display error messages
+      function displayError(message) {
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.style.display = "block";
+        outputAreaDiv.style.display = "none"; // Hide output on error
+        downloadLink.style.display = "none"; // Hide download link on error
+      }
+
+      // Function to clear messages and output
+      function clearOutput() {
+        errorMessageDiv.style.display = "none";
+        errorMessageDiv.textContent = "";
+        generatedCodeContainerDiv.innerHTML = ""; // Clear previous code
+        outputAreaDiv.style.display = "none"; // Hide output area initially
+        downloadLink.style.display = "none"; // Hide download link
+      }
+
+      // Function to show/hide settings based on code type
+      function toggleSettings() {
+        const selectedType = codeTypeSelect.value;
+        if (selectedType === "qr") {
+          qrSettingsDiv.style.display = "block";
+          barcodeSettingsDiv.style.display = "none";
+        } else {
+          qrSettingsDiv.style.display = "none";
+          barcodeSettingsDiv.style.display = "block";
+        }
+        clearOutput(); // Clear output when changing type
+      }
+
+      // Handle change in code type selection
+      codeTypeSelect.addEventListener("change", toggleSettings);
+
+      // Handle Generate button click
+      generateCodeBtn.addEventListener("click", () => {
+        clearOutput(); // Clear previous results and messages
+
+        const data = codeDataInput.value.trim();
+        const type = codeTypeSelect.value;
+
+        if (!data) {
+          displayError("Please enter data for the code.");
+          return;
+        }
+
+        try {
+          outputAreaDiv.style.display = "block"; // Show output area
+
+          if (type === "qr") {
+            const size = parseInt(qrSizeInput.value, 10) || 200;
+            const colorDark = qrColorDarkInput.value || "#000000";
+            const colorLight = qrColorLightInput.value || "#ffffff";
+
+            // qrcode.js generates directly into the element
+            // We need a new element each time or clear the old one
+            generatedCodeContainerDiv.innerHTML = ""; // Clear previous QR/Barcode
+            const qrCodeDiv = document.createElement("div"); // qrcode.js works well with a div
+            // Set size directly on the container div for qrcode.js
+            qrCodeDiv.style.width = size + "px";
+            qrCodeDiv.style.height = size + "px";
+            generatedCodeContainerDiv.appendChild(qrCodeDiv);
+
+            new QRCode(qrCodeDiv, {
+              text: data,
+              width: size, // Pass size here
+              height: size, // Pass size here
+              colorDark: colorDark,
+              colorLight: colorLight,
+              correctLevel: QRCode.CorrectLevel.H, // qrcode.js default is H, stick with it
+            });
+
+            // qrcode.js places an img or canvas inside the div
+            // We need to wait briefly for it to render before getting the data URL
+            setTimeout(() => {
+              const generatedElement =
+                qrCodeDiv.querySelector("img") ||
+                qrCodeDiv.querySelector("canvas");
+              if (generatedElement) {
+                let dataUrl;
+                if (generatedElement.tagName.toLowerCase() === "img") {
+                  dataUrl = generatedElement.src;
+                } else if (
+                  generatedElement.tagName.toLowerCase() === "canvas"
+                ) {
+                  // Ensure canvas is not empty (e.g., white only)
+                  try {
+                    const context = generatedElement.getContext("2d");
+                    const imageData = context.getImageData(
+                      0,
+                      0,
+                      generatedElement.width,
+                      generatedElement.height
+                    );
+                    // Check if there are any non-white pixels (more robust than just checking for 'data:,')
+                    let hasColor = false;
+                    for (let i = 0; i < imageData.data.length; i += 4) {
+                      if (
+                        imageData.data[i] < 255 ||
+                        imageData.data[i + 1] < 255 ||
+                        imageData.data[i + 2] < 255
+                      ) {
+                        hasColor = true;
+                        break;
+                      }
+                    }
+                    if (hasColor) {
+                      dataUrl = generatedElement.toDataURL("image/png");
+                    } else {
+                      throw new Error("Generated QR code canvas is blank.");
+                    }
+                  } catch (canvasError) {
+                    displayError(
+                      "Error getting QR code image data for download: " +
+                        canvasError.message
+                    );
+                    return; // Stop execution here
+                  }
+                }
+
+                if (dataUrl) {
+                  downloadLink.href = dataUrl;
+                  downloadLink.download = "qrcode_" + Date.now() + ".png";
+                  downloadLink.style.display = "inline-block"; // Show download link
+                } else {
+                  displayError(
+                    "Failed to get QR code image data URL for download."
+                  );
+                  downloadLink.style.display = "none"; // Hide download link
+                }
+              } else {
+                displayError("QR code element not found after generation.");
+                downloadLink.style.display = "none"; // Hide download link
+              }
+            }, 100); // Short delay to allow rendering
+          } else if (type === "barcode") {
+            const format = barcodeFormatSelect.value; // JsBarcode handles 'auto' and others
+            const height = parseInt(barcodeHeightInput.value, 10) || 60;
+            const displayValue = barcodeDisplayValueSelect.value === "true";
+            const lineColor = barcodeLineColorInput.value || "#000000";
+            const textColor = barcodeTextColorInput.value || "#000000";
+            const background = barcodeBackgroundInput.value || "#ffffff";
+            const margin = parseInt(barcodeMarginInput.value, 10) || 10;
+
+            generatedCodeContainerDiv.innerHTML = ""; // Clear previous QR/Barcode
+            const barcodeCanvas = document.createElement("canvas"); // JsBarcode works well with a canvas
+            generatedCodeContainerDiv.appendChild(barcodeCanvas);
+
+            try {
+              // Attempt to generate the barcode
+              JsBarcode(barcodeCanvas, data, {
+                format: format === "auto" ? "auto" : format, // Pass 'auto' string or specific format
+                height: height,
+                displayValue: displayValue,
+                lineColor: lineColor,
+                textColor: textColor,
+                background: background,
+                margin: margin,
+                // Text configuration is handled by textColor, fontSize (default), font (default)
+              });
+
+              // Set download link href from the canvas
+              // Need a slight delay sometimes for canvas rendering to complete
+              setTimeout(() => {
+                // Check if the canvas has actual content (not just empty or fully white)
+                try {
+                  const context = barcodeCanvas.getContext("2d");
+                  const imageData = context.getImageData(
+                    0,
+                    0,
+                    barcodeCanvas.width,
+                    barcodeCanvas.height
+                  );
+                  let hasColor = false;
+                  for (let i = 0; i < imageData.data.length; i += 4) {
+                    if (
+                      imageData.data[i] < 255 ||
+                      imageData.data[i + 1] < 255 ||
+                      imageData.data[i + 2] < 255
+                    ) {
+                      hasColor = true;
+                      break;
+                    }
+                  }
+
+                  if (hasColor) {
+                    downloadLink.href = barcodeCanvas.toDataURL("image/png");
+                    downloadLink.download = "barcode_" + Date.now() + ".png";
+                    downloadLink.style.display = "inline-block"; // Show download link
+                  } else {
+                    // This might happen if JsBarcode failed internally or data was invalid
+                    throw new Error(
+                      "Generated barcode canvas is blank. Please check data and format compatibility."
+                    );
+                  }
+                } catch (canvasError) {
+                  // Catch errors during canvas data URL creation or blank check
+                  displayError(
+                    "Barcode generation failed: " + canvasError.message
+                  );
+                  generatedCodeContainerDiv.innerHTML = ""; // Clear the canvas
+                  outputAreaDiv.style.display = "none"; // Hide output area
+                  downloadLink.style.display = "none"; // Hide download link
+                }
+              }, 100); // Short delay
+            } catch (e) {
+              // Handle errors specific to JsBarcode (e.g., invalid characters for format)
+              // Display a user-friendly message suggesting the data is the issue
+              displayError(
+                'Barcode generation failed. Please ensure the data ("' +
+                  data +
+                  '") is valid for the selected "' +
+                  format.toUpperCase() +
+                  '" format.'
+              );
+              generatedCodeContainerDiv.innerHTML = ""; // Clear the partial canvas if error
+              outputAreaDiv.style.display = "none"; // Hide output area
+              downloadLink.style.display = "none"; // Hide download link
+            }
+          }
+        } catch (error) {
+          displayError(
+            "An unexpected error occurred during generation: " + error.message
+          );
+          generatedCodeContainerDiv.innerHTML = ""; // Clear output on error
+          outputAreaDiv.style.display = "none"; // Hide output area
+          downloadLink.style.display = "none"; // Hide download link
+        }
+      });
+
+      // Initial setup: show QR settings and hide download link
+      toggleSettings();
+      downloadLink.style.display = "none";
+    </script>
+  </body>
+</html>

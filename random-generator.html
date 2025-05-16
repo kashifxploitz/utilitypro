@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Random Generator - Multi-Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        flex: 1;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        color: #007bff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .tool-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .option {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .password-group {
+        margin-bottom: 20px;
+      }
+
+      .password-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .output-group {
+        margin-top: 20px;
+      }
+
+      #output {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        min-height: 100px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background: #007bff;
+        color: #fff;
+        margin-top: auto;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .options {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Random Generator</h1>
+        <p>Generate random numbers or secure passwords with ease.</p>
+      </header>
+
+      <section class="tool-section">
+        <div class="input-group">
+          <label for="generatorType">Generator Type</label>
+          <select id="generatorType" onchange="toggleOptions()">
+            <option value="number">Random Number</option>
+            <option value="password">Secure Password</option>
+          </select>
+        </div>
+
+        <div id="numberOptions" class="input-group">
+          <label for="minValue">Minimum Value</label>
+          <input type="number" id="minValue" value="1" />
+          <label for="maxValue">Maximum Value</label>
+          <input type="number" id="maxValue" value="100" />
+          <label for="quantity">Quantity</label>
+          <input type="number" id="quantity" value="1" min="1" />
+        </div>
+
+        <div id="passwordOptions" class="options" style="display: none">
+          <div class="option">
+            <input type="checkbox" id="includeUppercase" checked />
+            <label for="includeUppercase">Uppercase Letters</label>
+          </div>
+          <div class="option">
+            <input type="checkbox" id="includeLowercase" checked />
+            <label for="includeLowercase">Lowercase Letters</label>
+          </div>
+          <div class="option">
+            <input type="checkbox" id="includeNumbers" checked />
+            <label for="includeNumbers">Numbers</label>
+          </div>
+          <div class="option">
+            <input type="checkbox" id="includeSymbols" checked />
+            <label for="includeSymbols">Symbols</label>
+          </div>
+          <div class="option">
+            <label for="passwordLength">Length:</label>
+            <input
+              type="number"
+              id="passwordLength"
+              value="12"
+              min="4"
+              max="50"
+              style="width: 80px"
+            />
+          </div>
+        </div>
+
+        <div class="password-group">
+          <input
+            type="password"
+            id="password"
+            placeholder="Optional: Enter password to protect output file"
+          />
+        </div>
+
+        <button onclick="generate()">Generate</button>
+
+        <div class="output-group">
+          <div id="output"></div>
+          <button onclick="downloadOutput()" style="margin-top: 10px">
+            Download Results
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>© 2025 Multi-Tool Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function toggleOptions() {
+        const type = document.getElementById("generatorType").value;
+        document.getElementById("numberOptions").style.display =
+          type === "number" ? "block" : "none";
+        document.getElementById("passwordOptions").style.display =
+          type === "password" ? "flex" : "none";
+      }
+
+      function generateRandomNumber(min, max) {
+        const array = new Uint32Array(1);
+        crypto.getRandomValues(array);
+        return min + (array[0] % (max - min + 1));
+      }
+
+      function generatePassword(length, options) {
+        const uppercase = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+        const lowercase = "abcdefghijklmnopqrstuvwxyz";
+        const numbers = "0123456789";
+        const symbols = "!@#$%^&*()_+-=[]{}|;:,.<>?";
+        let chars = "";
+        if (options.uppercase) chars += uppercase;
+        if (options.lowercase) chars += lowercase;
+        if (options.numbers) chars += numbers;
+        if (options.symbols) chars += symbols;
+
+        if (!chars) return "Please select at least one character type.";
+
+        let password = "";
+        const array = new Uint8Array(length);
+        crypto.getRandomValues(array);
+        for (let i = 0; i < length; i++) {
+          password += chars[array[i] % chars.length];
+        }
+        return password;
+      }
+
+      function generate() {
+        const type = document.getElementById("generatorType").value;
+        const output = document.getElementById("output");
+
+        if (type === "number") {
+          const min = parseInt(document.getElementById("minValue").value);
+          const max = parseInt(document.getElementById("maxValue").value);
+          const quantity = parseInt(document.getElementById("quantity").value);
+
+          if (isNaN(min) || isNaN(max) || min > max) {
+            output.textContent = "Please enter valid min and max values.";
+            return;
+          }
+          if (isNaN(quantity) || quantity < 1) {
+            output.textContent = "Please enter a valid quantity.";
+            return;
+          }
+
+          const results = [];
+          for (let i = 0; i < quantity; i++) {
+            results.push(generateRandomNumber(min, max));
+          }
+          output.textContent = results.join("\n");
+        } else {
+          const length = parseInt(
+            document.getElementById("passwordLength").value
+          );
+          const options = {
+            uppercase: document.getElementById("includeUppercase").checked,
+            lowercase: document.getElementById("includeLowercase").checked,
+            numbers: document.getElementById("includeNumbers").checked,
+            symbols: document.getElementById("includeSymbols").checked,
+          };
+
+          if (isNaN(length) || length < 4 || length > 50) {
+            output.textContent = "Please enter a valid password length (4-50).";
+            return;
+          }
+
+          const password = generatePassword(length, options);
+          output.textContent = password;
+        }
+      }
+
+      function downloadOutput() {
+        const output = document.getElementById("output").textContent;
+        const password = document.getElementById("password").value;
+
+        if (!output) {
+          alert("Please generate something first!");
+          return;
+        }
+
+        const blob = new Blob([output], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = password
+          ? "random_results_protected.txt"
+          : "random_results.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (password) {
+          alert(
+            "Note: Password protection is simulated for this demo. The file is not actually encrypted."
+          );
+        }
+      }
+    </script>
+  </body>
+</html>

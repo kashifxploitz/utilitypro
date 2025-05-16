@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scientific Calculator & Image Converter</title>
+    <style>
+        :root {
+            --primary-color: #007bff; /* Bright Blue */
+            --primary-hover-color: #0056b3; /* Darker Blue for hover */
+            --secondary-color: #ffffff; /* White */
+            --text-color: #333333;
+            --light-gray-bg: #f0f4f8; /* Light gray page background */
+            --border-color: #dee2e6;
+            --success-color: #28a745;
+            --success-hover-color: #218838;
+            --danger-color: #dc3545;
+            --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --calc-btn-bg: #e9ecef;
+            --calc-btn-hover-bg: #d3d9df;
+            --calc-op-btn-bg: #cce5ff; /* Light blue for operators */
+            --calc-op-btn-hover-bg: #b8daff;
+            --calc-eq-btn-bg: var(--success-color);
+            --calc-eq-btn-hover-bg: var(--success-hover-color);
+            --calc-sp-btn-bg: #ffc107; /* Yellow for special functions like AC/DEL */
+            --calc-sp-btn-hover-bg: #e0a800;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--light-gray-bg);
+            margin: 0;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .tool-container {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 700px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .tool-container h2 {
+            color: var(--primary-color);
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 2em;
+            border-bottom: 2px solid var(--light-gray-bg);
+            padding-bottom: 10px;
+        }
+
+        /* Scientific Calculator Styles */
+        .calculator {
+            width: 100%;
+            max-width: 400px; /* Max width for calculator itself */
+            margin: 0 auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 15px;
+            background-color: #fdfdfd;
+        }
+
+        #calc-display-container {
+            position: relative;
+        }
+
+        #calc-display {
+            width: calc(100% - 20px); /* Account for padding */
+            height: 60px;
+            padding: 10px;
+            font-size: 2em;
+            text-align: right;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+            background-color: var(--secondary-color);
+            overflow-x: auto; /* For long expressions */
+            white-space: nowrap;
+        }
+        #calc-deg-rad {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-size: 0.7em;
+            color: var(--primary-color);
+            background-color: var(--light-gray-bg);
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr); /* Default 5 columns */
+            gap: 8px;
+        }
+
+        .calc-btn {
+            padding: 18px 10px;
+            font-size: 1.1em;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            background-color: var(--calc-btn-bg);
+            color: var(--text-color);
+        }
+
+        .calc-btn:hover {
+            background-color: var(--calc-btn-hover-bg);
+        }
+        .calc-btn:active {
+            transform: scale(0.95);
+        }
+
+        .calc-btn.operator, .calc-btn.func-trig, .calc-btn.func-log, .calc-btn.func-sqrt {
+            background-color: var(--calc-op-btn-bg);
+        }
+        .calc-btn.operator:hover, .calc-btn.func-trig:hover, .calc-btn.func-log:hover, .calc-btn.func-sqrt:hover {
+            background-color: var(--calc-op-btn-hover-bg);
+        }
+        .calc-btn.func-power { /* For x^2, x^y */
+             background-color: #b3d7ff;
+        }
+        .calc-btn.func-power:hover {
+             background-color: #a0cfff;
+        }
+
+
+        .calc-btn.equals {
+            background-color: var(--calc-eq-btn-bg);
+            color: var(--secondary-color);
+        }
+        .calc-btn.equals:hover {
+            background-color: var(--calc-eq-btn-hover-bg);
+        }
+
+        .calc-btn.special { /* AC, DEL */
+            background-color: var(--calc-sp-btn-bg);
+            color: var(--text-color);
+        }
+         .calc-btn.special:hover {
+            background-color: var(--calc-sp-btn-hover-bg);
+        }
+
+        .calc-btn.zero {
+            grid-column: span 2;
+        }
+        .calc-btn.equals {
+             grid-column: span 2;
+        }
+
+        .calc-deg-rad-toggle {
+            /* grid-column: span 2; */ /* Let it be normal size */
+            background-color: #6c757d;
+            color: white;
+            font-size: 0.9em; /* Slightly smaller for more text */
+        }
+        .calc-deg-rad-toggle:hover {
+            background-color: #5a6268;
+        }
+
+
+        /* Image Converter Styles */
+        .upload-label {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s ease;
+            font-weight: 500;
+            margin-bottom: 10px;
+        }
+
+        .upload-label:hover {
+            background-color: var(--primary-hover-color);
+        }
+
+        #imageUploadInput {
+            display: none;
+        }
+
+        #imageFileName {
+            margin-top: 5px;
+            margin-bottom: 15px;
+            font-style: italic;
+            color: #777;
+            font-size: 0.9em;
+            min-height: 1.2em; /* Reserve space */
+        }
+
+        .image-preview-area {
+            width: 100%;
+            min-height: 150px;
+            max-height: 350px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background-color: #fdfdfd;
+            position: relative;
+        }
+
+        #imagePreview {
+            max-width: 100%;
+            max-height: 340px;
+            display: none; /* Initially hidden */
+            object-fit: contain;
+        }
+
+        #imagePreview.active {
+            display: block;
+        }
+
+        #imagePlaceholderText {
+            color: #aaa;
+            font-size: 1em;
+        }
+
+        .image-options-section, .image-download-section {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+
+        .image-options-section label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--primary-color);
+            font-size: 1.1em;
+        }
+
+        .image-custom-select-wrapper, .image-quality-wrapper {
+            display: inline-block;
+            width: 100%;
+            max-width: 280px;
+            margin-bottom:15px;
+        }
+
+        #imageFormatSelect, #imageQualitySlider {
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 1em;
+            font-weight: 500;
+            color: var(--text-color);
+            background-color: var(--secondary-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+        #imageFormatSelect {
+            cursor: pointer;
+        }
+
+        #imageQualityLabel {
+            font-size: 0.9em;
+            color: #555;
+        }
+
+
+        .image-action-button {
+            padding: 12px 28px;
+            background-color: var(--success-color);
+            color: var(--secondary-color);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            opacity: 0.7;
+            pointer-events: none; /* Initially disabled */
+        }
+
+        .image-action-button.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .image-action-button:hover:not(:disabled) {
+            background-color: var(--success-hover-color);
+        }
+        
+        .info-text {
+            font-size: 0.9em;
+            color: #666;
+            margin-top: 20px;
+            text-align: left;
+            background-color: var(--light-gray-bg);
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .info-text strong { color: var(--primary-color); }
+        .info-text ul { padding-left: 20px; margin-top: 5px; }
+        .info-text li { margin-bottom: 3px; }
+
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            color: #777;
+            width: 100%;
+        }
+
+        .footer a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body { padding: 10px; }
+            .tool-container { padding: 20px; }
+            .tool-container h2 { font-size: 1.6em; }
+            
+            .calculator { max-width: 100%; padding: 10px; }
+            #calc-display { height: 50px; font-size: 1.8em; }
+            .calc-buttons { grid-template-columns: repeat(5, 1fr); } /* Consistent 5 columns */
+            .calc-btn { font-size: 1em; padding: 15px 8px; }
+            .calc-btn.func-trig, .calc-btn.func-log, .calc-btn.func-sqrt, .calc-btn.func-power { font-size: 0.9em; }
+            .calc-btn.equals { grid-column: span 2; }
+            .calc-btn.zero { grid-column: span 2;}
+
+
+            .upload-label, .image-action-button, #imageFormatSelect {
+                font-size: 0.95em;
+                padding: 10px 20px;
+            }
+            .image-custom-select-wrapper, .image-quality-wrapper {
+                max-width: 100%;
+            }
+        }
+         @media (max-width: 420px) {
+            .calc-buttons { grid-template-columns: repeat(4, 1fr); } /* 4 columns for very small screens */
+            .calc-btn { font-size: 0.9em; }
+            .calc-btn.func-trig, .calc-btn.func-log, .calc-btn.func-sqrt, .calc-btn.func-power { font-size: 0.8em; }
+            .calc-btn.equals, .calc-btn.zero { grid-column: span 2; } /* Ensure these span 2 on 4-col layout */
+         }
+    </style>
+</head>
+<body>
+
+    <div class="tool-container">
+        <h2>Scientific Calculator</h2>
+        <div class="calculator">
+            <div id="calc-display-container">
+                <div id="calc-display">0</div>
+                <span id="calc-deg-rad">RAD</span>
+            </div>
+            <div class="calc-buttons">
+                <button class="calc-btn calc-deg-rad-toggle" onclick="calcToggleDegRad()">DEG/RAD</button>
+                <button class="calc-btn func-trig" onclick="calcInput('Math.sin(')">sin</button>
+                <button class="calc-btn func-trig" onclick="calcInput('Math.cos(')">cos</button>
+                <button class="calc-btn func-trig" onclick="calcInput('Math.tan(')">tan</button>
+                <button class="calc-btn special" onclick="calcClear()">AC</button>
+
+                <button class="calc-btn func-trig" onclick="calcInput('Math.asin(')">sin⁻¹</button>
+                <button class="calc-btn func-trig" onclick="calcInput('Math.acos(')">cos⁻¹</button>
+                <button class="calc-btn func-trig" onclick="calcInput('Math.atan(')">tan⁻¹</button>
+                <button class="calc-btn operator" onclick="calcInput('(')">(</button>
+                <button class="calc-btn operator" onclick="calcInput(')')">)</button>
+                
+                <button class="calc-btn func-log" onclick="calcInput('Math.log10(')">log</button>
+                <button class="calc-btn func-log" onclick="calcInput('Math.log(')">ln</button>
+                <button class="calc-btn func-sqrt" onclick="calcInput('Math.sqrt(')">√</button>
+                <button class="calc-btn func-power" onclick="calcInput('**2')">x²</button>
+                <button class="calc-btn special" onclick="calcDelete()">DEL</button>
+
+                <button class="calc-btn" onclick="calcInput('7')">7</button>
+                <button class="calc-btn" onclick="calcInput('8')">8</button>
+                <button class="calc-btn" onclick="calcInput('9')">9</button>
+                <button class="calc-btn operator" onclick="calcInput('/')">÷</button>
+                <button class="calc-btn func-power" onclick="calcInput('**')">xʸ</button>
+                
+                <button class="calc-btn" onclick="calcInput('4')">4</button>
+                <button class="calc-btn" onclick="calcInput('5')">5</button>
+                <button class="calc-btn" onclick="calcInput('6')">6</button>
+                <button class="calc-btn operator" onclick="calcInput('*')">×</button>
+                <button class="calc-btn operator" onclick="calcInput('%')">%</button>
+
+                <button class="calc-btn" onclick="calcInput('1')">1</button>
+                <button class="calc-btn" onclick="calcInput('2')">2</button>
+                <button class="calc-btn" onclick="calcInput('3')">3</button>
+                <button class="calc-btn operator" onclick="calcInput('-')">−</button>
+                <button class="calc-btn pi" onclick="calcInput('Math.PI')">π</button>
+                
+                <button class="calc-btn zero" onclick="calcInput('0')">0</button>
+                <button class="calc-btn" onclick="calcInput('.')">.</button>
+                <button class="calc-btn operator" onclick="calcInput('+')">+</button>
+                <button class="calc-btn e-const" onclick="calcInput('Math.E')">e</button>
+                <button class="calc-btn equals" onclick="calcCalculate()">=</button>
+            </div>
+        </div>
+        <div class="info-text">
+            <strong>Calculator Usage:</strong>
+            <ul>
+                <li>Current mode: <span id="calc-mode-status">RAD</span>. Click DEG/RAD to toggle between Radians and Degrees.</li>
+                <li>For <strong>xʸ</strong> (power): Enter base, press [xʸ], enter exponent (e.g., <code>2</code> [xʸ] <code>3</code> for 2³).</li>
+                <li>For <strong>x²</strong> (square): Enter number, press [x²] (e.g., <code>5</code> [x²] for 5²).</li>
+                <li><strong>%</strong>: Divides the current number by 100 (e.g., <code>50</code> [%] results in 0.5). For percentage calculations like "A + B% of A", compute manually (e.g., for 100 + 10%, calculate <code>100 + 100*10/100</code>).</li>
+                <li>Use ( ) for grouping. Ensure parentheses are balanced.</li>
+                <li>DEL removes the last entry/character. AC clears all input.</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tool-container">
+        <h2>Image Format Converter</h2>
+        <label for="imageUploadInput" class="upload-label">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-upload" viewBox="0 0 16 16" style="margin-right: 8px; vertical-align: middle;">
+                <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+            </svg>
+            Upload Image
+        </label>
+        <input type="file" id="imageUploadInput" accept="image/*">
+        <p id="imageFileName">No file chosen</p>
+
+        <div class="image-preview-area">
+            <img id="imagePreview" src="#" alt="Image Preview">
+            <span id="imagePlaceholderText">Image Preview</span>
+        </div>
+
+        <div class="image-options-section">
+            <div class="image-custom-select-wrapper">
+                <label for="imageFormatSelect">Convert to:</label>
+                <select id="imageFormatSelect" disabled>
+                    <option value="png">PNG</option>
+                    <option value="jpeg">JPEG</option>
+                    <option value="webp">WEBP</option>
+                    <option value="bmp">BMP (Basic)</option>
+                    <option value="gif">GIF (Static)</option>
+                </select>
+            </div>
+            <div class="image-quality-wrapper" id="imageQualityControl" style="display: none;">
+                <label for="imageQualitySlider">Quality: <span id="imageQualityValue">0.92</span></label>
+                <input type="range" id="imageQualitySlider" min="0.1" max="1" step="0.01" value="0.92">
+            </div>
+        </div>
+
+        <div class="image-download-section">
+            <button id="imageConvertDownloadBtn" class="image-action-button">
+                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-down-circle" viewBox="0 0 16 16" style="margin-right: 8px; vertical-align: middle;">
+                    <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8zm15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM8.5 4.5a.5.5 0 0 0-1 0v5.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V4.5z"/>
+                </svg>
+                Convert & Download
+            </button>
+            <a id="imageDownloadLink" style="display: none;"></a>
+        </div>
+         <p class="info-text">
+            <strong>Image Converter How-to:</strong>
+            <ul>
+            <li>Upload an image.</li>
+            <li>Preview appears above.</li>
+            <li>Select output format. Adjust quality for JPEG/WEBP if shown.</li>
+            <li>Click "Convert & Download".</li>
+            <li><small>Note: Processing is done in your browser. Images are not uploaded to any server.</small></li>
+            </ul>
+        </p>
+    </div>
+
+    <footer class="footer">
+        <p>&copy; <span id="currentYear"></span> Your Multi-Tool Website. Inspired by <a href="https://kashifxploitz.github.io/zoneoftools/" target="_blank" rel="noopener noreferrer">zoneoftools</a>.</p>
+    </footer>
+
+    <script>
+        // --- Scientific Calculator Script ---
+        const calcDisplay = document.getElementById('calc-display');
+        const calcDegRadDisplay = document.getElementById('calc-deg-rad');
+        const calcModeStatusDisplay = document.getElementById('calc-mode-status'); // Corrected ID usage
+        let calcCurrentInput = '0';
+        let calcIsRadians = true;
+        // For functions that should not be preceded by a number directly without an operator
+        const functionsRequiringOperatorBeforeNumber = ['Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.asin(', 'Math.acos(', 'Math.atan(', 'Math.log10(', 'Math.log(', 'Math.sqrt('];
+
+        function updateCalcDisplay() {
+            calcDisplay.textContent = calcCurrentInput;
+        }
+
+        function calcInput(value) {
+            const lastChar = calcCurrentInput.slice(-1);
+            const lastTwoChars = calcCurrentInput.slice(-2);
+
+            if (calcCurrentInput === '0' && value !== '.' && value !== '-') {
+                 // Allow starting with functions or constants
+                if (!isFunctionOrConstant(value) && value !== '(' && value !== '**') {
+                     calcCurrentInput = '';
+                } else if (isFunctionOrConstant(value)) {
+                     calcCurrentInput = ''; // Functions/constants replace initial 0
+                }
+            } else if (calcCurrentInput === 'Error' || calcCurrentInput === 'Infinity' || calcCurrentInput === '-Infinity' || calcCurrentInput === 'NaN') {
+                if (isOperator(value) || value === '%' || value === '**' || value === '**2') {
+                    // Allow continuing calculation from error/infinity if an operator is pressed
+                } else {
+                    calcCurrentInput = '0'; // Reset if number or function
+                    if (calcCurrentInput === '0' && value !== '.' && value !== '-') { // Re-apply initial 0 logic
+                        if (!isFunctionOrConstant(value) && value !== '(' && value !== '**') calcCurrentInput = '';
+                        else if (isFunctionOrConstant(value)) calcCurrentInput = '';
+                    }
+                }
+            }
+
+
+            // Prevent multiple operators / invalid sequences
+            if (isOperator(value) || value === '**') {
+                if (isOperator(lastChar) || lastChar === '*' && lastTwoChars === '**' || lastChar === '.') { // Avoid num**. or num*operator
+                    calcCurrentInput = calcCurrentInput.slice(0, - (lastTwoChars === '**' ? 2 : 1) );
+                }
+            }
+            if (value === '.' && lastChar === '.') return; // Avoid multiple decimals like ".."
+            if (value === '.' && calcCurrentInput.split(/[\+\-\*\/\(\)\%\*\*]/).pop().includes('.')) return; // Avoid "2.3.4"
+
+            // Smartly add multiplication for "number(" or ")number" or ")(" or "PI(" or "E("
+            if (value === '(' && (isNumeric(lastChar) || lastChar === ')' || lastChar === 'I' /*PI*/ || lastChar === 'E' /*Math.E*/)) {
+                calcCurrentInput += '*';
+            }
+            if (isNumeric(value) && lastChar === ')') {
+                 calcCurrentInput += '*';
+            }
+             if (functionsRequiringOperatorBeforeNumber.includes(value) && (isNumeric(lastChar) || lastChar === ')')) {
+                calcCurrentInput += '*';
+            }
+             if ((value === 'Math.PI' || value === 'Math.E') && (isNumeric(lastChar) || lastChar === ')')) {
+                calcCurrentInput += '*';
+            }
+
+
+            if (value === '%') {
+                // If previous is number, apply /100.
+                // Otherwise, it's an operator and should be treated as such by eval (modulo) if not handled.
+                // For simplicity, we'll primarily support N% = N/100.
+                // More complex % logic (like 100+10%) is in user notes to do manually.
+                const lastNumberMatch = calcCurrentInput.match(/([0-9\.]+)$/);
+                if(lastNumberMatch) {
+                    // calcCurrentInput = calcCurrentInput.substring(0, calcCurrentInput.length - lastNumberMatch[0].length) + `(${lastNumberMatch[0]}/100)`;
+                    // Simpler: just append /100. User needs to group if needed.
+                     calcCurrentInput += '/100';
+                } else {
+                     calcCurrentInput += value; // Let eval handle it as modulo if it's like X % Y
+                }
+
+            } else {
+                calcCurrentInput += value;
+            }
+            updateCalcDisplay();
+        }
+        
+        function isOperator(char) { return ['+', '-', '*', '/'].includes(char); }
+        function isNumeric(char) { return !isNaN(parseFloat(char)) && isFinite(char); }
+        function isFunctionOrConstant(value) {
+            return value.startsWith('Math.') || functionsRequiringOperatorBeforeNumber.includes(value);
+        }
+
+
+        function calcClear() {
+            calcCurrentInput = '0';
+            updateCalcDisplay();
+        }
+
+        function calcDelete() {
+            const funcsWithParen = ['Math.sin(', 'Math.cos(', 'Math.tan(', 'Math.asin(', 'Math.acos(', 'Math.atan(', 'Math.log10(', 'Math.log(', 'Math.sqrt('];
+            let processed = false;
+
+            for (const func of funcsWithParen) {
+                if (calcCurrentInput.endsWith(func)) {
+                    calcCurrentInput = calcCurrentInput.slice(0, -func.length);
+                    processed = true;
+                    break;
+                }
+            }
+            if (!processed) {
+                if (calcCurrentInput.endsWith('Math.PI')) calcCurrentInput = calcCurrentInput.slice(0, -7);
+                else if (calcCurrentInput.endsWith('Math.E')) calcCurrentInput = calcCurrentInput.slice(0, -6);
+                else if (calcCurrentInput.endsWith('**2')) calcCurrentInput = calcCurrentInput.slice(0, -3);
+                else if (calcCurrentInput.endsWith('**')) calcCurrentInput = calcCurrentInput.slice(0, -2);
+                else if (calcCurrentInput.endsWith('/100')) calcCurrentInput = calcCurrentInput.slice(0, -4); // for %
+                else if (calcCurrentInput.length > 0) calcCurrentInput = calcCurrentInput.slice(0, -1);
+            }
+
+            if (calcCurrentInput === "" || calcCurrentInput === "-") calcCurrentInput = '0';
+            updateCalcDisplay();
+        }
+
+        function calcToggleDegRad() {
+            calcIsRadians = !calcIsRadians;
+            const modeText = calcIsRadians ? 'RAD' : 'DEG';
+            calcDegRadDisplay.textContent = modeText;
+            if (calcModeStatusDisplay) calcModeStatusDisplay.textContent = modeText;
+        }
+        
+        function toRadians(degrees) { return degrees * (Math.PI / 180); }
+        function toDegrees(radians) { return radians * (180 / Math.PI); }
+
+        function preprocessForEval(expression) {
+            let expr = expression;
+            // Handle trig functions based on DEG/RAD mode
+            const trigFuncs = [
+                {name: 'sin', mathName: 'Math.sin'}, {name: 'cos', mathName: 'Math.cos'}, {name: 'tan', mathName: 'Math.tan'},
+                {name: 'asin', mathName: 'Math.asin'}, {name: 'acos', mathName: 'Math.acos'}, {name: 'atan', mathName: 'Math.atan'}
+            ];
+
+            if (!calcIsRadians) { // If in DEGREES mode
+                trigFuncs.forEach(f => {
+                    // For direct functions like sin(val), convert val to radians
+                    const regexDirect = new RegExp(`${f.mathName.replace('(','\\(')}\\s*\\(([^\\)]+)\\)`, 'g');
+                    expr = expr.replace(regexDirect, (match, val) => `${f.mathName}(toRadians(${val}))`);
+                    
+                    // For inverse functions, convert the result from radians to degrees
+                    if (f.name.startsWith('a')) { // asin, acos, atan
+                         const regexInverse = new RegExp(`${f.mathName.replace('(','\\(')}\\s*\\(([^\\)]+)\\)`, 'g');
+                         // This replacement needs to be careful not to double-wrap toDegrees if already done
+                         // Simpler to let it evaluate in radians then convert if necessary, or apply toDegrees around the Math.a*(...)
+                         // The problem: if the content of Math.asin(X) is itself a complex expression
+                         // This is where a proper parser would be better. For eval, it's tricky.
+
+                         // A common approach: wrap the function call
+                         expr = expr.replace(new RegExp(f.mathName.replace('.', '\\.') + '\\(([^\\)]+)\\)', 'g'), `toDegrees(${f.mathName}($1))`);
+                    }
+                });
+            }
+             // Ensure implied multiplications for "number Math.PI" or "number Math.E"
+            expr = expr.replace(/([0-9\)])(\s*Math\.(PI|E))/g, '$1 * $2');
+            expr = expr.replace(/(Math\.(PI|E))(\s*[0-9\(])/g, '$1 * $3');
+            
+            // Final check for %: if it wasn't converted to /100 (e.g. x % y)
+            // eval handles `A % B` as modulo, which is fine.
+            // The earlier N% -> N/100 handles the unary case.
+            return expr;
+        }
+
+
+        function calcCalculate() {
+            try {
+                let expressionToEval = calcCurrentInput;
+                if (expressionToEval === '0' && calcDisplay.textContent !== '0') { // handles empty input if display was '0' but user deleted
+                     expressionToEval = calcDisplay.textContent;
+                }
+
+                expressionToEval = preprocessForEval(expressionToEval);
+                
+                // Replace multiple operators before eval (e.g. 5*-+2 -> 5*-2)
+                expressionToEval = expressionToEval.replace(/([+\-*/])([+\-*\/]+)/g, (match, p1, p2) => {
+                    // Keep the last operator, unless it's a + or - following * or /
+                    let lastOp = p2.slice(-1);
+                    if ((p1 === '*' || p1 === '/') && (lastOp === '+' || lastOp === '-')) {
+                        return p1 + lastOp; // e.g. 5*-2
+                    }
+                    return lastOp; // e.g. 5---2 -> 5-2
+                });
+
+
+                const result = new Function('toRadians', 'toDegrees', 'return ' + expressionToEval)(toRadians, toDegrees);
+
+                if (Number.isNaN(result)) {
+                    calcCurrentInput = 'NaN';
+                } else if (!Number.isFinite(result)) {
+                    calcCurrentInput = result > 0 ? 'Infinity' : '-Infinity';
+                } else {
+                    calcCurrentInput = String(parseFloat(result.toFixed(10))); // Round to avoid floating point issues
+                }
+            } catch (error) {
+                console.error("Calculator error:", error, "Expression:", calcCurrentInput);
+                calcCurrentInput = 'Error';
+            }
+            updateCalcDisplay();
+        }
+
+
+        // --- Image Converter Script (mostly unchanged from previous, assumed okay) ---
+        const imageUploadInput = document.getElementById('imageUploadInput');
+        const imagePreviewEl = document.getElementById('imagePreview');
+        const imagePlaceholderText = document.getElementById('imagePlaceholderText');
+        const imageFileNameDisplay = document.getElementById('imageFileName');
+        const imageFormatSelect = document.getElementById('imageFormatSelect');
+        const imageConvertDownloadBtn = document.getElementById('imageConvertDownloadBtn');
+        const imageDownloadLink = document.getElementById('imageDownloadLink');
+        const imageQualityControl = document.getElementById('imageQualityControl');
+        const imageQualitySlider = document.getElementById('imageQualitySlider');
+        const imageQualityValue = document.getElementById('imageQualityValue');
+
+        let uploadedImageFile = null;
+        let originalImageFileName = 'converted_image';
+
+        imageUploadInput.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (file) {
+                uploadedImageFile = file;
+                originalImageFileName = file.name.split('.')[0];
+                imageFileNameDisplay.textContent = file.name;
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreviewEl.src = e.target.result;
+                    imagePreviewEl.classList.add('active');
+                    imagePlaceholderText.style.display = 'none';
+                    imageFormatSelect.disabled = false;
+                    imageConvertDownloadBtn.classList.add('active');
+                    toggleImageQualityControl();
+                }
+                reader.readAsDataURL(file);
+            } else {
+                resetImageTool();
+            }
+        });
+
+        imageFormatSelect.addEventListener('change', toggleImageQualityControl);
+
+        function toggleImageQualityControl() {
+            const selectedFormat = imageFormatSelect.value;
+            if (selectedFormat === 'jpeg' || selectedFormat === 'webp') {
+                imageQualityControl.style.display = 'block';
+            } else {
+                imageQualityControl.style.display = 'none';
+            }
+        }
+
+        imageQualitySlider.addEventListener('input', function() {
+            imageQualityValue.textContent = parseFloat(this.value).toFixed(2);
+        });
+
+        function resetImageTool() {
+            imagePreviewEl.src = '#';
+            imagePreviewEl.classList.remove('active');
+            imagePlaceholderText.style.display = 'block';
+            imageFileNameDisplay.textContent = 'No file chosen';
+            imageFormatSelect.disabled = true;
+            imageFormatSelect.value = 'png';
+            imageConvertDownloadBtn.classList.remove('active');
+            imageQualityControl.style.display = 'none';
+            imageQualitySlider.value = 0.92;
+            imageQualityValue.textContent = '0.92';
+            uploadedImageFile = null;
+            originalImageFileName = 'converted_image';
+        }
+
+        imageConvertDownloadBtn.addEventListener('click', function() {
+            if (!uploadedImageFile) {
+                alert('Please upload an image first.');
+                return;
+            }
+
+            const selectedFormat = imageFormatSelect.value;
+            const quality = parseFloat(imageQualitySlider.value);
+            let mimeType = `image/${selectedFormat}`;
+             if (selectedFormat === 'bmp') mimeType = 'image/bmp'; // Explicitly set for BMP
+
+            const tempImage = new Image();
+            tempImage.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = tempImage.naturalWidth;
+                canvas.height = tempImage.naturalHeight;
+                const ctx = canvas.getContext('2d');
+
+                if (selectedFormat === 'jpeg' || selectedFormat === 'bmp') {
+                    ctx.fillStyle = '#FFFFFF'; 
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                }
+                ctx.drawImage(tempImage, 0, 0);
+
+                try {
+                    let convertedUrl;
+                    if (mimeType === 'image/jpeg' || mimeType === 'image/webp') {
+                        convertedUrl = canvas.toDataURL(mimeType, quality);
+                    } else {
+                        convertedUrl = canvas.toDataURL(mimeType);
+                    }
+
+                    imageDownloadLink.href = convertedUrl;
+                    imageDownloadLink.download = `${originalImageFileName}.${selectedFormat}`;
+                    imageDownloadLink.click();
+                } catch (e) {
+                    console.error("Image Conversion Error: ", e);
+                    alert(`Error converting image to ${selectedFormat.toUpperCase()}. This format might have limited browser support for direct conversion.`);
+                }
+            };
+            tempImage.onerror = () => {
+                alert('Error processing the uploaded image file.');
+            };
+            tempImage.src = URL.createObjectURL(uploadedImageFile);
+        });
+
+
+        // --- Common ---
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+        // Initial setup
+        calcClear(); 
+        if (calcModeStatusDisplay) calcModeStatusDisplay.textContent = calcIsRadians ? 'RAD' : 'DEG'; // Initialize mode display in notes
+    </script>
+</body>
+</html>

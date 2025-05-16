@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Unlock PDF - My Multi-Tool Website</title>
+    <style>
+      /* General Styles */
+      :root {
+        --primary-blue: #007bff; /* Bright Blue */
+        --secondary-blue: #e9f5ff; /* Lighter Blue for backgrounds */
+        --text-color: #333;
+        --border-color: #ccc;
+        --success-color: #28a745;
+        --error-color: #dc3545;
+        --white: #fff;
+        --padding-base: 15px;
+        --margin-base: 20px;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+        line-height: 1.6;
+        margin: 0;
+        padding: 0;
+        background-color: var(--secondary-blue);
+        color: var(--text-color);
+        display: flex;
+        justify-content: center;
+        align-items: flex-start; /* Align to top */
+        min-height: 100vh;
+        padding-top: var(--margin-base); /* Add some space at the top */
+      }
+
+      .container {
+        background-color: var(--white);
+        padding: var(--margin-base);
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        max-width: 500px;
+        text-align: center;
+        margin-bottom: var(--margin-base); /* Space at the bottom */
+      }
+
+      h1 {
+        color: var(--primary-blue);
+        margin-bottom: 10px;
+      }
+
+      p {
+        margin-bottom: var(--margin-base);
+        color: #555;
+      }
+
+      /* File Upload Styles */
+      .upload-area {
+        border: 2px dashed var(--border-color);
+        border-radius: 5px;
+        padding: var(--padding-base);
+        margin-bottom: var(--margin-base);
+        cursor: pointer;
+        transition: border-color 0.3s ease;
+      }
+
+      .upload-area:hover {
+        border-color: var(--primary-blue);
+      }
+
+      .upload-area input[type="file"] {
+        display: none; /* Hide actual file input */
+      }
+
+      .upload-area label {
+        display: block;
+        cursor: pointer;
+        color: var(--primary-blue);
+        font-weight: bold;
+      }
+
+      #selectedFileName {
+        margin-top: 10px;
+        font-style: italic;
+        color: #555;
+        word-break: break-all; /* Prevent overflow */
+      }
+
+      /* Password Input Styles */
+      .input-group {
+        margin-bottom: var(--margin-base);
+        text-align: left; /* Align label/input nicely */
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: var(--text-color);
+      }
+
+      .input-group input[type="password"] {
+        width: 100%;
+        padding: var(--padding-base) 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 5px;
+        box-sizing: border-box; /* Include padding in width */
+        font-size: 1rem;
+      }
+
+      /* Button Styles */
+      .btn-primary {
+        display: block;
+        width: 100%;
+        padding: var(--padding-base);
+        background-color: var(--primary-blue);
+        color: var(--white);
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      .btn-primary:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+      }
+
+      .btn-primary:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+      }
+
+      /* Status Area Styles */
+      #statusMessage {
+        margin-top: var(--margin-base);
+        padding: var(--padding-base);
+        border-radius: 5px;
+        min-height: 1.2em; /* Reserve space */
+      }
+
+      .status-success {
+        background-color: #d4edda;
+        color: var(--success-color);
+        border: 1px solid var(--success-color);
+      }
+
+      .status-error {
+        background-color: #f8d7da;
+        color: var(--error-color);
+        border: 1px solid var(--error-color);
+      }
+
+      /* Responsive Styles */
+      @media (max-width: 600px) {
+        .container {
+          padding: var(--padding-base);
+          margin-left: var(--padding-base);
+          margin-right: var(--padding-base);
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+
+        .btn-primary {
+          font-size: 1rem;
+          padding: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Unlock PDF</h1>
+      <p>
+        Remove password protection from your PDF file (password must be known).
+      </p>
+
+      <div class="upload-area" id="uploadArea">
+        <input type="file" id="pdfFile" accept=".pdf" />
+        <label for="pdfFile">Click to Select PDF</label>
+        <div id="selectedFileName">No file selected</div>
+      </div>
+
+      <div class="input-group">
+        <label for="pdfPassword">Enter Password:</label>
+        <input type="password" id="pdfPassword" placeholder="Known password" />
+      </div>
+
+      <button class="btn-primary" id="unlockBtn">Unlock PDF</button>
+
+      <div id="statusMessage"></div>
+    </div>
+
+    <script>
+      const pdfFile = document.getElementById('pdfFile');
+      const uploadArea = document.getElementById('uploadArea');
+      const selectedFileName = document.getElementById('selectedFileName');
+      const pdfPassword = document.getElementById('pdfPassword');
+      const unlockBtn = document.getElementById('unlockBtn');
+      const statusMessage = document.getElementById('statusMessage');
+
+      // Update file name display when a file is selected
+      pdfFile.addEventListener('change', function() {
+          if (this.files && this.files.length > 0) {
+              selectedFileName.textContent = this.files[0].name;
+              statusMessage.textContent = ''; // Clear previous status
+              statusMessage.className = ''; // Clear status classes
+              unlockBtn.disabled = false; // Enable button if a file is selected
+          } else {
+              selectedFileName.textContent = 'No file selected';
+              unlockBtn.disabled = true; // Disable button if no file
+          }
+      });
+
+      // Enable button only when a file is selected initially
+      unlockBtn.disabled = true;
+
+
+      // Handle Unlock button click
+      unlockBtn.addEventListener('click', function() {
+          const file = pdfFile.files[0];
+          const password = pdfPassword.value;
+
+          if (!file) {
+              displayStatus('Please select a PDF file.', 'error');
+              return;
+          }
+
+          if (!password) {
+              displayStatus('Please enter the password.', 'error');
+              return;
+          }
+
+          displayStatus('Processing...', ''); // Indicate processing
+
+          // --- IMPORTANT LIMITATION MESSAGE ---
+          // This is where the actual PDF decryption logic would go.
+          // However, performing complex PDF parsing and decryption in pure
+          // client-side JavaScript without external libraries is not feasible.
+          // A library like 'pdf-lib' or server-side processing would be required.
+          // The following simulates a process and shows the limitation.
+
+          setTimeout(() => { // Simulate processing time
+              displayStatus(
+                  'Technical Limitation: Client-side PDF decryption without external libraries is extremely complex and cannot be achieved with simple pure JavaScript. ' +
+                  'This tool provides the UI, but the core "unlocking" functionality requires a specialized library (e.g., pdf-lib) or server-side processing.',
+                  'error' // Use error style as it's a limitation notice
+              );
+              // In a real scenario, you might try to use a library here,
+              // or initiate a server request.
+          }, 1500); // Simulate a delay
+
+      });
+
+      // Helper function to display status messages
+      function displayStatus(message, type) {
+          statusMessage.textContent = message;
+          statusMessage.className = ''; // Clear previous classes
+          if (type === 'success') {
+              statusMessage.classList.add('status-success');
+          } else if (type === 'error') {
+              statusMessage.classList.add('status-error');
+          }
+      }
+
+      // Add drag and drop functionality (Optional but good for tool sites)
+      uploadArea.addEventListener('dragover', (e) => {
+          e.preventDefault();
+          uploadArea.style.borderColor = var(--primary-blue);
+      });
+
+      uploadArea.addEventListener('dragleave', (e) => {
+          e.preventDefault();
+          uploadArea.style.borderColor = var(--border-color);
+      });
+
+      uploadArea.addEventListener('drop', (e) => {
+          e.preventDefault();
+          uploadArea.style.borderColor = var(--border-color);
+          const files = e.dataTransfer.files;
+          if (files.length > 0 && files[0].type === 'application/pdf') {
+              pdfFile.files = files; // Assign dropped files to the input
+              pdfFile.dispatchEvent(new Event('change')); // Trigger change event
+          } else {
+               displayStatus('Please drop a valid PDF file.', 'error');
+          }
+      });
+    </script>
+  </body>
+</html>

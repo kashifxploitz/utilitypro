@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Meta Tag Analyzer - Your Multi-Tool Website</title>
+    <style>
+      /* Basic Reset and Body Styling */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f6; /* Light grey background */
+        color: #333; /* Dark grey text */
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 15px; /* Padding on sides for mobile */
+      }
+
+      /* Header Styling */
+      header {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2em;
+      }
+
+      /* Tool Section Styling */
+      .tool-section {
+        background-color: #fff; /* White background */
+        padding: 25px;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .tool-section h2 {
+        color: #1e88e5; /* Bright Blue */
+        margin-top: 0;
+        border-bottom: 2px solid #e0e0e0; /* Light grey border */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Form Styling */
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Include padding and border in element's total width and height */
+        font-size: 1em;
+      }
+
+      button {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+      }
+
+      button:hover {
+        background-color: #1565c0; /* Darker Blue on hover */
+      }
+
+      button:disabled {
+        background-color: #b0bec5; /* Grey when disabled */
+        cursor: not-allowed;
+      }
+
+      /* Info/Error Message Styling */
+      .info-message,
+      .error-message {
+        padding: 10px;
+        margin-top: 15px;
+        border-radius: 4px;
+        font-size: 0.9em;
+      }
+
+      .info-message {
+        background-color: #e3f2fd; /* Light blue */
+        border: 1px solid #90caf9; /* Lighter blue border */
+        color: #1e88e5; /* Bright blue text */
+      }
+
+      .error-message {
+        background-color: #ffebee; /* Light red */
+        border: 1px solid #ef9a9a; /* Lighter red border */
+        color: #c62828; /* Dark red text */
+      }
+
+      /* Results Area Styling */
+      #results {
+        margin-top: 25px;
+        padding-top: 20px;
+        border-top: 2px solid #e0e0e0; /* Light grey border */
+      }
+
+      #results h3 {
+        color: #1e88e5; /* Bright Blue */
+        margin-bottom: 15px;
+      }
+
+      .meta-tag-item {
+        background-color: #f9f9f9; /* Very light grey */
+        border: 1px solid #eee; /* Very light grey border */
+        padding: 12px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        word-break: break-word; /* Break long words */
+      }
+
+      .meta-tag-item strong {
+        color: #555;
+        display: inline-block; /* Ensure padding/margin works */
+        min-width: 80px; /* Align key names */
+        margin-right: 10px;
+      }
+
+      .meta-tag-item span {
+        color: #333;
+      }
+
+      .no-results {
+        font-style: italic;
+        color: #777;
+      }
+
+      /* Loading Spinner (Basic) */
+      .loader {
+        border: 4px solid #f3f3f3; /* Light grey */
+        border-top: 4px solid #1e88e5; /* Bright blue */
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        display: none; /* Hidden by default */
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Responsive Design */
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.5em;
+        }
+
+        .tool-section {
+          padding: 15px;
+        }
+
+        button {
+          width: 100%; /* Full width buttons on small screens */
+          margin-bottom: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>Meta Tag Analyzer</h1>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="tool-section">
+        <h2>Analyze Website Meta Tags</h2>
+
+        <div class="info-message">
+          <strong>Technical Note:</strong> Due to browser security restrictions
+          (CORS), this client-side tool cannot fetch content from arbitrary
+          external websites directly. To analyze an external URL, you would
+          typically need a simple server-side script to fetch the page content.
+        </div>
+
+        <div class="form-group">
+          <label for="websiteUrl"
+            >Enter Website URL (External sites require server support):</label
+          >
+          <input
+            type="text"
+            id="websiteUrl"
+            placeholder="e.g., https://www.example.com"
+          />
+        </div>
+
+        <button id="analyzeExternalBtn">Analyze External URL (Limited)</button>
+        <button id="analyzeCurrentBtn">Analyze This Page's Meta Tags</button>
+
+        <div id="loadingSpinner" class="loader"></div>
+
+        <div
+          id="errorMessage"
+          class="error-message"
+          style="display: none"
+        ></div>
+
+        <div id="results">
+          <h3>Analysis Results</h3>
+          <div id="metaTagsList">
+            <p class="no-results">No meta tags analyzed yet.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const websiteUrlInput = document.getElementById("websiteUrl");
+      const analyzeExternalBtn = document.getElementById("analyzeExternalBtn");
+      const analyzeCurrentBtn = document.getElementById("analyzeCurrentBtn");
+      const loadingSpinner = document.getElementById("loadingSpinner");
+      const errorMessageDiv = document.getElementById("errorMessage");
+      const metaTagsListDiv = document.getElementById("metaTagsList");
+
+      // Function to display error messages
+      function displayError(message) {
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.style.display = "block";
+      }
+
+      // Function to clear messages and results
+      function clearMessagesAndResults() {
+        errorMessageDiv.style.display = "none";
+        errorMessageDiv.textContent = "";
+        metaTagsListDiv.innerHTML = '<p class="no-results">Analyzing...</p>'; // Placeholder while processing
+        loadingSpinner.style.display = "block";
+      }
+
+      // Function to display meta tags
+      function displayMetaTags(metaTags) {
+        loadingSpinner.style.display = "none";
+        metaTagsListDiv.innerHTML = ""; // Clear placeholder
+
+        if (metaTags.length === 0) {
+          metaTagsListDiv.innerHTML =
+            '<p class="no-results">No meta tags found on this page.</p>';
+          return;
+        }
+
+        metaTags.forEach((tag) => {
+          const tagDiv = document.createElement("div");
+          tagDiv.classList.add("meta-tag-item");
+
+          let contentHTML = "";
+          if (tag.name) {
+            contentHTML += `<strong>Name:</strong> <span>${escapeHTML(
+              tag.name
+            )}</span><br>`;
+          }
+          if (tag.property) {
+            contentHTML += `<strong>Property:</strong> <span>${escapeHTML(
+              tag.property
+            )}</span><br>`;
+          }
+          if (tag.httpEquiv) {
+            contentHTML += `<strong>http-equiv:</strong> <span>${escapeHTML(
+              tag.httpEquiv
+            )}</span><br>`;
+          }
+          if (tag.charset) {
+            contentHTML += `<strong>charset:</strong> <span>${escapeHTML(
+              tag.charset
+            )}</span><br>`;
+          }
+          if (tag.content !== undefined) {
+            // Content can be an empty string, check for undefined
+            contentHTML += `<strong>Content:</strong> <span>${escapeHTML(
+              tag.content
+            )}</span>`;
+          }
+
+          tagDiv.innerHTML = contentHTML;
+          metaTagsListDiv.appendChild(tagDiv);
+        });
+      }
+
+      // Helper function to escape HTML to prevent XSS
+      function escapeHTML(str) {
+        const div = document.createElement("div");
+        div.appendChild(document.createTextNode(str));
+        return div.innerHTML;
+      }
+
+      // Function to parse HTML string and extract meta tags
+      function parseAndExtractMetaTags(htmlString) {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(htmlString, "text/html");
+        const metaElements = doc.querySelectorAll("meta");
+        const metaTags = [];
+
+        metaElements.forEach((meta) => {
+          const tagData = {
+            name: meta.getAttribute("name"),
+            property: meta.getAttribute("property"),
+            httpEquiv: meta.getAttribute("http-equiv"),
+            charset: meta.getAttribute("charset"),
+            content: meta.getAttribute("content"),
+          };
+          // Add the tag data if it has any meaningful attributes
+          if (
+            tagData.name ||
+            tagData.property ||
+            tagData.httpEquiv ||
+            tagData.charset
+          ) {
+            metaTags.push(tagData);
+          }
+        });
+        return metaTags;
+      }
+
+      // Event listener for the "Analyze This Page" button
+      analyzeCurrentBtn.addEventListener("click", () => {
+        clearMessagesAndResults();
+        // Get the entire HTML content of the current page
+        const currentHTML = document.documentElement.outerHTML;
+        const metaTags = parseAndExtractMetaTags(currentHTML);
+        displayMetaTags(metaTags);
+      });
+
+      // Event listener for the "Analyze External URL" button
+      analyzeExternalBtn.addEventListener("click", () => {
+        const url = websiteUrlInput.value.trim();
+
+        if (!url) {
+          displayError("Please enter a website URL.");
+          return;
+        }
+
+        // Basic URL format check (not exhaustive)
+        if (!url.startsWith("http://") && !url.startsWith("https://")) {
+          displayError(
+            "Please enter a valid URL starting with http:// or https://"
+          );
+          return;
+        }
+
+        clearMessagesAndResults();
+
+        // --- CORS Limitation Explanation ---
+        // This is where you would typically fetch the URL content using a server-side proxy.
+        // Since this is a client-side only example, we display the limitation.
+        metaTagsListDiv.innerHTML = ""; // Clear "Analyzing..." placeholder
+        loadingSpinner.style.display = "none"; // Hide spinner
+
+        const corsInfo = document.createElement("div");
+        corsInfo.classList.add("info-message");
+        corsInfo.innerHTML = `
+                <h3>External URL Analysis Limitation</h3>
+                <p>Analyzing external URLs directly from the browser is blocked by security policies (CORS).</p>
+                <p>To make this work for external sites, you need a server-side script (e.g., in PHP, Node.js, Python) that:</p>
+                <ol>
+                    <li>Receives the URL from the client (this page).</li>
+                    <li>Fetches the content of that URL from the server.</li>
+                    <li>Sends the fetched HTML content back to this page.</li>
+                </ol>
+                <p>Once the HTML content is received from your server script, the existing client-side JavaScript can parse and display the meta tags.</p>
+                 <p>You can click "Analyze This Page's Meta Tags" to see how the analysis works on the current page.</p>
+            `;
+        metaTagsListDiv.appendChild(corsInfo);
+
+        // Example of how you *would* call the parsing function if you had the HTML:
+        // Assuming 'fetchedHtmlContent' is the string received from your server proxy:
+        // const metaTags = parseAndExtractMetaTags(fetchedHtmlContent);
+        // displayMetaTags(metaTags);
+      });
+
+      // Initial state setup
+      metaTagsListDiv.innerHTML =
+        '<p class="no-results">No meta tags analyzed yet.</p>';
+    </script>
+  </body>
+</html>

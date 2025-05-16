@@ -1,0 +1,2053 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Utility Pro - Your Daily Tools, All in One Place</title>
+    <style>
+      /* ===== General Styles ===== */
+      :root {
+        --primary-blue: #1cc47b;
+        --light-blue: #82f8b5;
+        --medium-blue: #27b772;
+        --dark-blue-text: #07523a; /* For text on light backgrounds */
+        --dark-blue-bg: #004429; /* For footer or dark elements */
+        --neutral-bg: #f8f9fa;
+        --border-color: #dee2e6;
+        --text-dark: #212529;
+        --text-medium: #495057;
+        --text-light: #6c757d;
+        --white: #ffffff;
+        --soft-shadow: 0 4px 15px rgba(0, 122, 255, 0.1);
+        --stronger-shadow: 0 8px 25px rgba(0, 122, 255, 0.15);
+        --font-logo: "Montserrat", sans-serif;
+        --font-heading: "Poppins", sans-serif;
+        --font-body: "Roboto", sans-serif;
+      }
+      body {
+        font-family: var(--font-body);
+        margin: 0;
+        padding: 0;
+        background-color: var(--neutral-bg);
+        color: var(--text-medium);
+        line-height: 1.6;
+        overflow-x: hidden;
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+      .container {
+        width: 90%;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 15px;
+      }
+      h1,
+      h2,
+      h3 {
+        font-family: var(--font-heading);
+        color: var(--dark-blue-text);
+        margin-top: 0;
+      }
+      a {
+        text-decoration: none;
+        color: var(--primary-blue);
+        transition: color 0.3s ease;
+      }
+      a:hover {
+        color: var(--medium-blue);
+      }
+      img {
+        max-width: 100%;
+        height: auto;
+        display: block;
+      }
+      button,
+      .button-like {
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.3s ease,
+          box-shadow 0.3s ease;
+      }
+      /* ===== Header ===== */
+      #main-header {
+        background-color: var(--white);
+        padding: 15px 0;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      #main-header.scrolled {
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+      }
+      .header-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      #main-header .logo {
+        font-family: var(--font-logo);
+        font-size: 1.8rem;
+        font-weight: 700; /* Slightly bold */
+        color: var(--primary-blue);
+        letter-spacing: 0.5px;
+      }
+      #main-header .main-nav ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        display: flex;
+      }
+      #main-header .main-nav ul li {
+        margin-left: 30px;
+      }
+      #main-header .main-nav ul li a.nav-link {
+        color: var(--text-dark);
+        font-weight: 500;
+        padding: 8px 0px; /* Smaller padding for just underline */
+        position: relative;
+        opacity: 1;
+      }
+      #main-header .main-nav ul li a.nav-link::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--primary-blue);
+        transition: width 0.3s ease, opacity 0.3s ease;
+      }
+      #main-header .main-nav ul li a.nav-link:hover,
+      #main-header .main-nav ul li a.nav-link.active {
+        color: var(--primary-blue);
+        opacity: 0.85; /* Fade effect */
+      }
+      #main-header .main-nav ul li a.nav-link:hover::after,
+      #main-header .main-nav ul li a.nav-link.active::after {
+        width: 100%;
+      }
+      #main-header .header-contact a {
+        font-size: 0.9em;
+        color: var(--text-light);
+      }
+      #main-header .header-contact a:hover {
+        color: var(--primary-blue);
+      }
+      .mobile-menu-toggle {
+        display: none;
+        background: none;
+        border: none;
+        padding: 0;
+      }
+      .mobile-menu-toggle svg rect {
+        transition: all 0.3s ease-in-out;
+      }
+      .mobile-menu-toggle.active svg rect:nth-child(1) {
+        transform: translateY(15px) rotate(45deg);
+      }
+      .mobile-menu-toggle.active svg rect:nth-child(2) {
+        opacity: 0;
+      }
+      .mobile-menu-toggle.active svg rect:nth-child(3) {
+        transform: translateY(-15px) rotate(-45deg);
+      }
+
+      /* ===== Hero Section ===== */
+      #hero {
+        background: linear-gradient(
+          135deg,
+          var(--light-blue) 0%,
+          var(--primary-blue) 100%
+        );
+        color: var(--white);
+        text-align: center;
+        padding: 100px 0 80px;
+        min-height: 60vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .hero-content h1.hero-headline {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 20px;
+        color: var(--white);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s 0.2s forwards;
+      }
+      .hero-content p.hero-subheadline {
+        font-size: 1.3rem;
+        margin-bottom: 30px;
+        max-width: 700px;
+        margin-left: auto;
+        margin-right: auto;
+        color: rgba(255, 255, 255, 0.85);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s 0.4s forwards;
+      }
+      .hero-content .cta-button {
+        background-color: var(--white);
+        color: var(--primary-blue);
+        padding: 15px 35px;
+        font-size: 1.1em;
+        font-weight: 600;
+        border-radius: 50px;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        display: inline-block;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeInUp 0.8s 0.6s forwards, pulse 2s infinite 1s;
+      }
+      .hero-content .cta-button:hover {
+        background-color: #f0f0f0;
+        color: var(--medium-blue);
+        transform: translateY(-3px) scale(1.03); /* Combined with pulse */
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+      }
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1) translateY(0);
+        } /* Base transform from fadeInUp */
+        50% {
+          transform: scale(1.03) translateY(0);
+        }
+      }
+      @keyframes fadeInUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .hero-illustrations {
+        margin-top: 50px;
+        display: flex;
+        justify-content: center;
+        gap: 40px;
+        flex-wrap: wrap;
+      }
+      .hero-illustrations .hero-icon {
+        width: 50px;
+        height: 50px;
+        opacity: 0;
+        transform: scale(0.5);
+        animation: popIn 0.5s forwards;
+      }
+      .hero-illustrations .hero-icon:nth-child(1) {
+        animation-delay: 0.8s;
+      }
+      .hero-illustrations .hero-icon:nth-child(2) {
+        animation-delay: 0.9s;
+      }
+      .hero-illustrations .hero-icon:nth-child(3) {
+        animation-delay: 1s;
+      }
+      .hero-illustrations .hero-icon:nth-child(4) {
+        animation-delay: 1.1s;
+      }
+      @keyframes popIn {
+        to {
+          opacity: 0.8;
+          transform: scale(1);
+        }
+      }
+
+      /* ===== Search Bar Section ===== */
+      #search-tools {
+        padding: 40px 0;
+        background-color: var(--white);
+      }
+      .search-container {
+        display: flex;
+        justify-content: center;
+      }
+      .search-wrapper {
+        position: relative;
+        width: 100%;
+        max-width: 600px;
+      }
+      .search-wrapper .search-icon {
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-blue);
+        transition: transform 0.3s ease;
+      }
+      #tool-search {
+        width: 100%;
+        padding: 15px 20px 15px 50px; /* Space for icon */
+        font-size: 1.1em;
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        outline: none;
+        box-sizing: border-box;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+      }
+      #tool-search:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.2);
+      }
+      #tool-search:focus + .search-icon {
+        transform: translateY(-50%) scale(1.1);
+      }
+
+      /* ===== Tool Categories ===== */
+      #tool-categories-start {
+        padding-top: 1px;
+      } /* Anchor point */
+      .tool-category {
+        padding: 60px 0;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+      }
+      .tool-category.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .tool-category:nth-child(even) {
+        background-color: var(--white); /* Alternate bg for sections */
+      }
+      .category-title {
+        font-size: 2.2rem;
+        text-align: center;
+        margin-bottom: 15px;
+        color: var(--dark-blue-text);
+        position: relative;
+        padding-bottom: 10px;
+      }
+      .category-title::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 70px;
+        height: 3px;
+        background-color: var(--primary-blue);
+        border-radius: 2px;
+      }
+      .category-description {
+        text-align: center;
+        font-size: 1.1em;
+        color: var(--text-light);
+        margin-bottom: 40px;
+        max-width: 600px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .tool-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 30px;
+      }
+      .tool-card {
+        background-color: var(--white);
+        border-radius: 12px;
+        padding: 25px;
+        text-align: center;
+        box-shadow: var(--soft-shadow);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        opacity: 0;
+        transform: translateY(30px);
+        /* transition-delay will be set by JS for stagger */
+      }
+      .tool-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .tool-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--stronger-shadow);
+      }
+      .tool-icon {
+        width: 50px;
+        height: 50px;
+        margin: 0 auto 20px auto;
+        color: var(--primary-blue); /* For SVG fill if not set in SVG */
+      }
+      .tool-name {
+        font-size: 1.4rem;
+        margin-bottom: 10px;
+        color: var(--primary-blue);
+      }
+      .tool-description {
+        font-size: 0.95rem;
+        color: var(--text-medium);
+        margin-bottom: 20px;
+        flex-grow: 1; /* Ensure cards have similar height before button */
+        min-height: 40px;
+      }
+      .tool-button {
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 10px 25px;
+        border-radius: 50px;
+        font-weight: 500;
+        display: inline-block;
+        border: 2px solid transparent;
+      }
+      .tool-button:hover {
+        background-color: var(--medium-blue);
+        color: var(--white);
+        transform: scale(1.05);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      }
+
+      /* ===== Footer ===== */
+      #main-footer {
+        background-color: var(--dark-blue-bg);
+        color: var(--light-blue);
+        padding: 50px 0 30px;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(30px);
+        transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+      }
+      #main-footer.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      .footer-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 25px;
+      }
+      #main-footer .footer-branding .logo {
+        font-family: var(--font-logo);
+        font-size: 1.6em;
+        font-weight: 700;
+        color: var(--white);
+      }
+      #main-footer .tagline {
+        font-size: 0.9em;
+        color: rgba(235, 245, 255, 0.8); /* Slightly transparent light blue */
+        margin-top: 5px;
+      }
+      #main-footer .footer-contact-info p {
+        margin: 0 0 5px 0;
+      }
+      #main-footer .footer-contact-info a {
+        color: var(--light-blue);
+      }
+      #main-footer .footer-contact-info a:hover {
+        color: var(--white);
+        text-decoration: underline;
+      }
+      #main-footer .footer-links a {
+        color: rgba(235, 245, 255, 0.8);
+        margin: 0 10px;
+        font-size: 0.9em;
+      }
+      #main-footer .footer-links a:hover {
+        color: var(--white);
+        text-decoration: underline;
+      }
+      #main-footer .footer-links span {
+        margin: 0 5px;
+      }
+      .theme-toggle-container {
+        margin-top: 15px;
+      }
+      #theme-toggle {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: var(--white);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 0.8em;
+      }
+      #theme-toggle:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+      }
+      #theme-toggle .sun-icon,
+      #theme-toggle .moon-icon {
+        display: inline-block;
+        vertical-align: middle;
+      }
+      .moon-icon {
+        display: none;
+      } /* Initially hidden */
+      .footer-copyright {
+        margin-top: 30px;
+        font-size: 0.85em;
+        color: rgba(235, 245, 255, 0.7);
+      }
+
+      /* ===== Dark Mode Styles ===== */
+      body.dark-mode {
+        --primary-blue: #0b8439; /* Slightly brighter blue for dark mode */
+        --light-blue: #089d4b;
+        --medium-blue: #03563c;
+        --dark-blue-text: #e0e0e0;
+        --dark-blue-bg: #033826;
+        --neutral-bg: #121212;
+        --border-color: #3a3a3a;
+        --text-dark: #f5f5f5;
+        --text-medium: #b0b0b0;
+        --text-light: #757575;
+        --white: #1e1e1e; /* Card backgrounds in dark mode */
+        --soft-shadow: 0 4px 15px rgba(0, 255, 145, 0.15);
+        --stronger-shadow: 0 8px 25px rgba(0, 255, 119, 0.2);
+      }
+      body.dark-mode #main-header {
+        background-color: #1a1a1a;
+        box-shadow: 0 2px 5px rgba(255, 255, 255, 0.03);
+      }
+      body.dark-mode #main-header .logo {
+        color: var(--primary-blue);
+      }
+      body.dark-mode #main-header .main-nav ul li a.nav-link {
+        color: var(--text-dark);
+      }
+      body.dark-mode #main-header .main-nav ul li a.nav-link:hover,
+      body.dark-mode #main-header .main-nav ul li a.nav-link.active {
+        color: var(--primary-blue);
+      }
+      body.dark-mode #main-header .main-nav ul li a.nav-link::after {
+        background-color: var(--primary-green);
+      }
+      body.dark-mode #main-header .header-contact a {
+        color: var(--text-green--primary-green);
+      }
+      body.dark-mode #main-header .header-contact a:hover {
+        color: var(--primary-green);
+      }
+      body.dark-mode .mobile-menu-toggle svg {
+        fill: var(--primary-green);
+      }
+
+      body.dark-mode #hero {
+        background: linear-gradient(135deg, #1a3a29 0%, #0affa1 100%);
+      }
+      body.dark-mode .hero-content .cta-button {
+        background-color: var(--primary-green);
+        color: #0d1721;
+        box-shadow: 0 4px 15px rgba(0, 255, 166, 0.3);
+      }
+      body.dark-mode .hero-content .cta-button:hover {
+        background-color: var(--medium-green--primary-green);
+        box-shadow: 0 6px 20px rgba(0, 255, 208, 0.35);
+      }
+
+      body.dark-mode #search-tools {
+        background-color: #1a1a1a;
+      }
+      body.dark-mode #tool-search {
+        background-color: #2c2c2c;
+        border-color: #444;
+        color: var(--text-dark);
+      }
+      body.dark-mode #tool-search:focus {
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(10, 255, 145, 0.25);
+      }
+      body.dark-mode .search-wrapper .search-icon {
+        color: var(--primary-green);
+      }
+
+      body.dark-mode .tool-category {
+        background-color: var(--neutral-bg);
+      } /* Base for dark */
+      body.dark-mode .tool-category:nth-child(even) {
+        background-color: #161616;
+      } /* Slightly different dark */
+      body.dark-mode .category-title {
+        color: var(--primary-green);
+      }
+      body.dark-mode .category-title::after {
+        background-color: var(--primary-green);
+      }
+      body.dark-mode .category-description {
+        color: var(--text-medium);
+green
+      body.dark-mode .tool-card {
+        background-color: #1e1e1e;
+        box-shadow: var(--soft-shadow);
+      }
+      body.dark-mode .tool-card:hover {
+        box-shadow: var(--stronger-shadow);
+      }
+      body.dark-mode .tool-icon {
+        color: var(--primary-green);
+      }
+      body.dark-mode .tool-name {
+        color: var(--primary-green);
+      }
+      body.dark-mode .tool-description {
+        color: var(--text-medium);
+      }
+      body.dark-mode .tool-button {
+        background-color: var(--primary-green);
+        color: #0d1721;
+      }
+      body.dark-mode .tool-button:hover {
+        background-color: var(--medium-green);
+      }
+
+      body.dark-mode #main-footer {
+        background-color: var(--dark-green-bg);
+        color: rgba(235, 245, 255, 0.8);
+      }
+      body.dark-mode #main-footer .footer-branding .logo {
+        color: var(--primary-green);
+      }
+      body.dark-mode #main-footer .tagline {
+        color: rgba(235, 245, 255, 0.7);
+      }
+      body.dark-mode #main-footer .footer-contact-info a {
+        color: rgba(235, 245, 255, 0.8);
+      }
+      body.dark-mode #main-footer .footer-contact-info a:hover {
+        color: var(--primary-green);
+      }
+      body.dark-mode #main-footer .footer-links a {
+        color: rgba(235, 245, 255, 0.7);
+      }
+      body.dark-mode #main-footer .footer-links a:hover {
+        color: var(--primary-green);
+      }
+      body.dark-mode #theme-toggle {
+        background-color: rgba(10, 132, 255, 0.2);
+        border-color: rgba(10, 132, 255, 0.3);
+        color: var(--primary-green);
+      }
+      body.dark-mode #theme-toggle:hover {
+        background-color: rgba(10, 132, 255, 0.3);
+      }
+      body.dark-mode .sun-icon {
+        display: none;
+      }
+      body.dark-mode .moon-icon {
+        display: inline-block;
+      }
+      body.dark-mode .footer-copyright {
+        color: rgba(235, 245, 255, 0.6);
+      }
+
+      /* ===== Responsive Design ===== */
+      @media (max-width: 992px) {
+        .hero-content h1.hero-headline {
+          font-size: 2.5rem;
+        }
+        .hero-content p.hero-subheadline {
+          font-size: 1.15rem;
+        }
+        .tool-grid {
+          grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        }
+      }
+      @media (max-width: 768px) {
+        #main-header .main-nav {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          width: 100%;
+          background-color: var(--white);
+          box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+          padding: 10px 0;
+          flex-direction: column;
+          z-index: 999;
+        }
+        body.dark-mode #main-header .main-nav {
+          background-color: #1a1a1a;
+        }
+        #main-header .main-nav.active {
+          display: flex;
+        }
+        #main-header .main-nav ul {
+          flex-direction: column;
+          width: 100%;
+        }
+        #main-header .main-nav ul li {
+          margin: 10px 0;
+          text-align: center;
+          width: 100%;
+        }
+        #main-header .main-nav ul li a.nav-link {
+          display: block;
+          padding: 10px 15px;
+        }
+        #main-header .main-nav ul li a.nav-link::after {
+          display: none;
+        } /* Remove underline for mobile stacked nav */
+        .mobile-menu-toggle {
+          display: block;
+        }
+        #main-header .header-contact {
+          display: none;
+        } /* Hide email, can be moved to mobile menu */
+
+        .hero-content h1.hero-headline {
+          font-size: 2rem;
+        }
+        .hero-content p.hero-subheadline {
+          font-size: 1rem;
+        }
+        .hero-content .cta-button {
+          padding: 12px 25px;
+          font-size: 1em;
+        }
+        .hero-illustrations {
+          gap: 20px;
+        }
+        .hero-illustrations .hero-icon {
+          width: 40px;
+          height: 40px;
+        }
+
+        .category-title {
+          font-size: 1.8rem;
+        }
+        .category-description {
+          font-size: 1rem;
+        }
+        .tool-grid {
+          grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+          gap: 20px;
+        }
+        .tool-card {
+          padding: 20px;
+        }
+        .footer-container {
+          flex-direction: column;
+          gap: 20px;
+        }
+      }
+      @media (max-width: 576px) {
+        .tool-grid {
+          grid-template-columns: 1fr;
+        }
+        .hero-content h1.hero-headline {
+          font-size: 1.8rem;
+        }
+        .hero-content p.hero-subheadline {
+          font-size: 0.9rem;
+        }
+        #main-header .logo {
+          font-size: 1.5rem;
+        }
+      }
+
+      /* Accessibility: Focus states for keyboard navigation */
+      a:focus-visible,
+      button:focus-visible,
+      input:focus-visible,
+      .tool-card:focus-visible {
+        outline: 3px solid var(--primary-blue);
+        outline-offset: 2px;
+        box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.3);
+      }
+      body.dark-mode a:focus-visible,
+      body.dark-mode button:focus-visible,
+      body.dark-mode input:focus-visible,
+      body.dark-mode .tool-card:focus-visible {
+        outline-color: var(
+          --primary-blue
+        ); /* Use dark mode primary blue for outline */
+        box-shadow: 0 0 0 4px rgba(10, 132, 255, 0.3);
+      }
+      .tool-card:focus-visible {
+        transform: translateY(-8px);
+        box-shadow: var(--stronger-shadow);
+      }
+    </style>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="icon"
+      href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛠️</text></svg>"
+    />
+  </head>
+  <body>
+    <header id="main-header">
+      <div class="container header-container">
+        <a href="/" class="logo">Utility Pro</a>
+        <nav class="main-nav" id="main-navigation">
+          <ul>
+            <li><a href="#hero" class="nav-link active">Home</a></li>
+            <li><a href="#tool-categories-start" class="nav-link">Tools</a></li>
+            <li><a href="#main-footer" class="nav-link">Contact</a></li>
+          </ul>
+        </nav>
+        <div class="header-contact">
+          <a href="mailto:work.kashif7@gmail.com">work.kashif7@gmail.com</a>
+        </div>
+        <button
+          class="mobile-menu-toggle"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="main-navigation"
+        >
+          <svg viewBox="0 0 100 70" width="25" height="25" fill="currentColor">
+            <rect width="100" height="10" rx="5"></rect>
+            <rect y="30" width="100" height="10" rx="5"></rect>
+            <rect y="60" width="100" height="10" rx="5"></rect>
+          </svg>
+        </button>
+      </div>
+    </header>
+
+    <section id="hero">
+      <div class="container hero-content">
+        <h1 class="hero-headline">Your Daily Tools, All in One Place</h1>
+        <p class="hero-subheadline">
+          Convert, calculate, compress, and simplify your everyday tasks — fast
+          and free.
+        </p>
+        <a href="#tool-categories-start" class="cta-button button-like" style="color: #013624;"
+          >Explore Tools</a
+        >
+        <div class="hero-illustrations">
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.01 11.51L11 11.49l-2.01 2.51L5.5 10l-1.51 2v3.5h16v-3.5l-3.01-4z'/%3E%3C/svg%3E"
+            alt="Image tools"
+            class="hero-icon"
+            loading="lazy"
+          />
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z'/%3E%3C/svg%3E"
+            alt="Document tools"
+            class="hero-icon"
+            loading="lazy"
+          />
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z'/%3E%3C/svg%3E"
+            alt="Developer tools"
+            class="hero-icon"
+            loading="lazy"
+          />
+          <img
+            src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23FFFFFF'%3E%3Cpath d='M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-2 10h-2v2h-2v-2H9v-2h2V9h2v2h2v2zm4-12H2v18h20V1z'/%3E%3C/svg%3E"
+            alt="Calculator tools"
+            class="hero-icon"
+            loading="lazy"
+          />
+        </div>
+      </div>
+    </section>
+
+    <section id="search-tools">
+      <div class="container search-container">
+        <div class="search-wrapper">
+          <input
+            type="search"
+            id="tool-search"
+            placeholder="Search a tool (e.g., PDF Converter, Image Resizer...)"
+          />
+          <svg
+            class="search-icon"
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            width="20"
+            height="20"
+          >
+            <path
+              d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"
+            />
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <main id="tool-categories-start">
+      <section class="tool-category" id="image-tools">
+        <div class="container">
+          <h2 class="category-title">🖼️ Image Tools</h2>
+          <p class="category-description">
+            Manipulate and optimize your images with ease: convert, compress,
+            resize, and more.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="Image Converter"
+              data-tool-keywords="jpg png webp gif tiff bmp"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5.01 11.51L11 11.49l-2.01 2.51L5.5 10l-1.51 2v3.5h16v-3.5l-3.01-4z'/%3E%3C/svg%3E"
+                alt="Image Converter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Image Converter</h3>
+              <p class="tool-description">
+                Convert images to various formats (JPG, PNG, WebP).
+              </p>
+              <a href="image-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Image Compressor"
+              data-tool-keywords="reduce size optimize"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M21.17 19.17l-2-2H5c-1.1 0-2-.9-2-2V5.83l-2-2L2.17 1 22 20.83l-.83.83zM5 3h14v11.17l-2-2V5H7.83l-2-2H19c1.1 0 2 .9 2 2v10c0 .88-.58 1.63-1.38 1.88L15.17 15H5V3zm0 18h14v-2H5v2z'/%3E%3C/svg%3E"
+                alt="Image Compressor"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Image Compressor</h3>
+              <p class="tool-description">
+                Reduce image file size without significant quality loss.
+              </p>
+              <a href="image-compressor.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Image Resizer"
+              data-tool-keywords="dimensions scale width height"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M21 11H6.83l3.58-3.59L9 6l-6 6 6 6 1.41-1.41L6.83 13H21v-2zM3 3h18v2H3V3zm0 16h18v2H3v-2z'/%3E%3C/svg%3E"
+                alt="Resizer"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Resizer</h3>
+              <p class="tool-description">
+                Change image dimensions (width and height) easily.
+              </p>
+              <a href="image-resizer.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Image Cropper"
+              data-tool-keywords="cut trim section"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z'/%3E%3C/svg%3E"
+                alt="Cropper"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Cropper</h3>
+              <p class="tool-description">
+                Crop images to select a specific area or ratio.
+              </p>
+              <a href="image-cropper.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="OCR Image to Text"
+              data-tool-keywords="extract text optical character recognition"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM8 11H6V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2zm0 4h-2v-2h2v2zm-4 0h-2v-2h2v2zm-4 0H6v-2h2v2z'/%3E%3C/svg%3E"
+                alt="OCR"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">OCR (Image to Text)</h3>
+              <p class="tool-description">
+                Extract text from images and scanned documents.
+              </p>
+              <a href="ocr.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Image Rotator"
+              data-tool-keywords="rotate flip mirror degrees"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M7.47 2.47L6.06 3.88C7.42 5.24 8 6.28 8 8H6c0-2.34.79-3.93 2.26-5.12L7.47 2.47zM12 1C6.48 1 2 5.48 2 11s4.48 10 10 10 10-4.48 10-10S17.52 1 12 1zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm2.53-15.53L15.94 2.06C14.58.7 13.54 0 12 0h-2c-2.34 0-3.93.79-5.12 2.26l-.41.41C3.06 4.08.78 6.36.78 9.5S3.06 14.92 4.47 16.33l1.41-1.41C4.78 13.82 4 12.78 4 11h2c0 2.34-.79 3.93-2.26 5.12l.41.41c1.41 1.41 3.69 3.69 6.74 3.69s5.33-2.28 6.74-3.69l.41-.41C16.85 14.93 16 13.34 16 11h2c0-1.28-.78-3.42-2.06-4.94z'/%3E%3C/svg%3E"
+                alt="Rotator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Rotator</h3>
+              <p class="tool-description">
+                Rotate images by 90, 180, or 270 degrees.
+              </p>
+              <a href="image-rotator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="document-tools">
+        <div class="container">
+          <h2 class="category-title">📄 Document Tools</h2>
+          <p class="category-description">
+            Manage and convert your documents effortlessly for any need.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="PDF to Word"
+              data-tool-keywords="pdf doc docx convert"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5H9v-2h2.5V6H9V4h4.5v7.5c0 .83-.67 1.5-1.5 1.5h-2c-.83 0-1.5-.67-1.5-1.5v-3h1.5v3H10v-2h1.5v2.5zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'/%3E%3C/svg%3E"
+                alt="PDF to Word"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">PDF to Word</h3>
+              <p class="tool-description">
+                Convert PDF files to editable Word documents (DOCX).
+              </p>
+              <a href="pdf-to-word.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Word to PDF"
+              data-tool-keywords="doc docx pdf convert"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20 2H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-8.5 7.5H9v-2h2.5V6H9V4h4.5v7.5c0 .83-.67 1.5-1.5 1.5h-2c-.83 0-1.5-.67-1.5-1.5v-3h1.5v3H10v-2h1.5v2.5zM4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6z'/%3E%3C/svg%3E"
+                alt="Word to PDF"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Word to PDF</h3>
+              <p class="tool-description">
+                Convert Word documents (DOC, DOCX) to PDF files.
+              </p>
+              <a href="word-to-pdf.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="PDF Compressor"
+              data-tool-keywords="reduce pdf size optimize"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M8 11h3v10H8v-3H5v3H2V11h3V1h3v10zm13-5v10h-3V1h-3v10h3v5h3V6h-3V1h-3v5h3z'/%3E%3C/svg%3E"
+                alt="PDF Compressor"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">PDF Compressor</h3>
+              <p class="tool-description">
+                Reduce the file size of your PDF documents quickly.
+              </p>
+              <a href="pdf-compressor.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="PDF Merger"
+              data-tool-keywords="combine pdf join"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M13 7h-2v4H7v2h4v4h2v-4h4v-2h-4V7zm-1-5C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/%3E%3C/svg%3E"
+                alt="PDF Merger"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">PDF Merger</h3>
+              <p class="tool-description">
+                Combine multiple PDF files into a single document.
+              </p>
+              <a href="pdf-merger.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="PDF Splitter"
+              data-tool-keywords="split pdf extract pages"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M3 15h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V9H3v2zm0-6v2h18V5H3zm4 0h2V3H7v2zm14 2H7v2h14V7zm-4 10h2v-2h-2v2zm0-4h2v-2h-2v2zm0-4h2V9h-2v2z'/%3E%3C/svg%3E"
+                alt="PDF Splitter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">PDF Splitter</h3>
+              <p class="tool-description">
+                Split a PDF into multiple smaller PDF files or extract pages.
+              </p>
+              <a href="pdf-splitter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="PDF Converter"
+              data-tool-keywords="pdf to jpg png excel powerpoint"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 10h-2v4h2v-4zm0-6h-2v2h2V6zm4 10h-2v4h2v-4zm0-6h-2v2h2v-4h-2v2z'/%3E%3C/svg%3E"
+                alt="PDF Converter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">PDF Converter</h3>
+              <p class="tool-description">
+                Convert PDF to/from various formats (JPG, Excel, etc.).
+              </p>
+              <a href="pdf-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Lock PDF"
+              data-tool-keywords="encrypt pdf password protect"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6-5c1.65 0 3 1.35 3 3v2H9V6c0-1.65 1.35-3 3-3zm6 15H6V10h12v8zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z'/%3E%3C/svg%3E"
+                alt="Lock PDF"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Lock PDF</h3>
+              <p class="tool-description">
+                Add a password to protect your PDF documents.
+              </p>
+              <a href="lock-pdf.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Unlock PDF"
+              data-tool-keywords="decrypt pdf remove password"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6h2c0-1.65 1.35-3 3-3s3 1.35 3 3v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm0 10H6V10h12v8zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z'/%3E%3C/svg%3E"
+                alt="Unlock PDF"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Unlock PDF</h3>
+              <p class="tool-description">
+                Remove password protection from PDF files (if known).
+              </p>
+              <a href="unlock-pdf.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="eSign PDF"
+              data-tool-keywords="sign pdf electronic signature digital"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19.91 4.09C19.52 3.7 18.93 3.5 18.28 3.5s-1.24.2-1.63.59L5.59 14.66c-.78.78-.78 2.05 0 2.83s2.05.78 2.83 0L19.91 6.41c.78-.78.78-2.05 0-2.83zm-2.24 2.24L17 7l-8.49 8.49c-.39.39-1.02.39-1.41 0s-.39-1.02 0-1.41L15.59 5.59l.66.66c.2.2.2.51 0 .71s-.51.2-.71 0L14.12 5.54l-1.41 1.41 1.42 1.42-1.41 1.41 1.41 1.41-1.41 1.41 2.83 2.83L19.91 9.34l-1.41-1.41 1.17-1.17zM4 20h14v2H2V6h2v14z'/%3E%3C/svg%3E"
+                alt="eSign PDF"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">eSign PDF</h3>
+              <p class="tool-description">
+                Electronically sign your PDF documents online.
+              </p>
+              <a href="esign.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="calculator-tools">
+        <div class="container">
+          <h2 class="category-title">🧮 Calculator Tools</h2>
+          <p class="category-description">
+            Perform various calculations quickly and accurately for finance,
+            health, and more.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="Scientific Calculator"
+              data-tool-keywords="math functions advanced"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19 3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.11 0 2-.9 2-2V5c0-1.1-.89-2-2-2zm-2 10h-2v2h-2v-2H9v-2h2V9h2v2h2v2zm4-12H2v18h20V1zM7 15H5v-2h2v2zm0-4H5V9h2v2zm0-4H5V5h2v2zm4 8H9v-2h2v2zm0-4H9V9h2v2zm0-4H9V5h2v2zm4 8h-2v-2h2v2zm0-4h-2V9h2v2zm0-4h-2V5h2v2zm4 8h-2v-2h2v2zm0-4h-2V9h2v2z'/%3E%3C/svg%3E"
+                alt="Scientific Calculator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Scientific Calculator</h3>
+              <p class="tool-description">
+                Advanced calculator for complex mathematical functions.
+              </p>
+              <a href="s-calculator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Age Calculator"
+              data-tool-keywords="birthday date years months days"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z'/%3E%3C/svg%3E"
+                alt="Age Calculator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Age Calculator</h3>
+              <p class="tool-description">
+                Calculate age from birth date in years, months, days.
+              </p>
+              <a href="age-calculator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="BMI Calculator"
+              data-tool-keywords="body mass index health weight height"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2.25L16.25 9 15 10.25l-2.25-2.25V12h-1.5V7.75L9 10.25 7.75 9 11 5.75V5h2v2z'/%3E%3C/svg%3E"
+                alt="BMI Calculator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">BMI Calculator</h3>
+              <p class="tool-description">
+                Calculate Body Mass Index to assess your weight status.
+              </p>
+              <a href="bmi-calculator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Loan EMI Calculator"
+              data-tool-keywords="equated monthly installment finance mortgage"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM10 8H8v4H5v2h3v4h2v-4h3v-2h-3V8zm7 2h-2v6h2V10zm-4 0h-2v6h2V10z'/%3E%3C/svg%3E"
+                alt="Loan EMI Calculator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Loan EMI Calculator</h3>
+              <p class="tool-description">
+                Calculate Equated Monthly Installments for loans.
+              </p>
+              <a href="loan-emi-calculator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="GST Calculator"
+              data-tool-keywords="goods services tax india finance"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M11.5 2C6.81 2 3 5.81 3 10.5S6.81 19 11.5 19h.5v3l3.56-3.56c3.05-.74 5.44-3.28 5.44-6.44C21 5.81 17.19 2 12.5 2h-1zm1 15h-1c-3.31 0-6-2.69-6-6s2.69-6 6-6h1c3.31 0 6 2.69 6 6s-2.69 6-6 6zm-1-10H9.25L11 9.25V7h-1.5v1.75L7.75 11H10V7zm4 4h.25L13 12.75V15h1.5v-1.75L16.25 11H14v4z'/%3E%3C/svg%3E"
+                alt="GST Calculator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">GST Calculator</h3>
+              <p class="tool-description">
+                Calculate Goods and Services Tax for transactions.
+              </p>
+              <a href="gst-calculator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Currency Converter"
+              data-tool-keywords="exchange rate money forex"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M15 12c0-1.66-1.34-3-3-3s-3 1.34-3 3 1.34 3 3 3 3-1.34 3-3zm-3-1c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm0-7C7.48 4 3 8.48 3 14s4.48 10 9 10 9-4.48 9-10S16.52 4 12 4zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-5h2v2H7v-2zm10 0h-2v2h2v-2zm-5-4h2v2h-2v-2z'/%3E%3C/svg%3E"
+                alt="Currency Converter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Currency Converter</h3>
+              <p class="tool-description">
+                Convert between different global currencies.
+              </p>
+              <a href="currency-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="text-tools">
+        <div class="container">
+          <h2 class="category-title">🔤 Text Tools</h2>
+          <p class="category-description">
+            Process and manipulate text for your needs: convert case, count
+            words, and more.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="Case Converter"
+              data-tool-keywords="uppercase lowercase titlecase sentencecase"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M2.75 18h18.5c.69 0 1.25-.56 1.25-1.25v-2.5c0-.69-.56-1.25-1.25-1.25H2.75c-.69 0-1.25.56-1.25 1.25v2.5c0 .69.56 1.25 1.25 1.25zM14 4H4v2h10V4zm0 4H4v2h10V8zm5-4h-2.69L12.5 10h2.69L19 4z'/%3E%3C/svg%3E"
+                alt="Case Converter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Case Converter</h3>
+              <p class="tool-description">
+                Change text to uppercase, lowercase, title case, etc.
+              </p>
+              <a href="case-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Word Counter"
+              data-tool-keywords="character count paragraph sentence"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z'/%3E%3C/svg%3E"
+                alt="Word Counter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Word Counter</h3>
+              <p class="tool-description">
+                Count words, characters, sentences, and paragraphs.
+              </p>
+              <a href="word-counter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Remove Duplicates"
+              data-tool-keywords="lines unique distinct filter"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M16 9H3V7h13v2zm0 4H3v-2h13v2zm5-8v10c0 1.1-.9 2-2 2H8v2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2h-2V3h-2v2h2zM3 17h13v-2H3v2z'/%3E%3C/svg%3E"
+                alt="Remove Duplicates"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Remove Duplicates</h3>
+              <p class="tool-description">
+                Remove duplicate lines or words from your text.
+              </p>
+              <a href="remove-duplicate.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Text Sorter"
+              data-tool-keywords="alphabetical numerical ascending descending"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M3 18h6v-2H3v2zM3 6v2h18V6H3zm0 7h12v-2H3v2z'/%3E%3C/svg%3E"
+                alt="Text Sorter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Text Sorter</h3>
+              <p class="tool-description">
+                Sort lines of text alphabetically or numerically.
+              </p>
+              <a href="text-sorter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Text Reverser"
+              data-tool-keywords="reverse words lines characters"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M9 3L5 6.99h3V14h2V6.99h3L9 3zm7 14.01V10h-2v7.01h-3L15 21l4-3.99h-3z'/%3E%3C/svg%3E"
+                alt="Text Reverser"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Text Reverser</h3>
+              <p class="tool-description">
+                Reverse text, words, or lines easily.
+              </p>
+              <a href="text-reverser.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Encryptor Decryptor"
+              data-tool-keywords="aes cipher secure message encode decode"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z'/%3E%3C/svg%3E"
+                alt="Encryptor/Decryptor"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Encryptor/Decryptor</h3>
+              <p class="tool-description">
+                Encrypt or decrypt text messages using ciphers.
+              </p>
+              <a href="enc-dec.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="developer-tools">
+        <div class="container">
+          <h2 class="category-title">🌐 Web/Developer Tools</h2>
+          <p class="category-description">
+            Essential utilities for web developers and designers to streamline
+            workflows.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="HTML CSS JS Minifier"
+              data-tool-keywords="minify code optimize website performance"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M14.59 16.59L16 18l6-6-6-6-1.41 1.41L18.17 11H3v2h15.17l-3.58 3.59zM3 3h18v2H3V3zm0 16h18v2H3v-2z'/%3E%3C/svg%3E"
+                alt="HTML/CSS/JS Minifier"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">HTML/CSS/JS Minifier</h3>
+              <p class="tool-description">
+                Reduce file size of web code (HTML, CSS, JavaScript).
+              </p>
+              <a href="hcj-minifier.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="JSON Formatter"
+              data-tool-keywords="beautify validate pretty print"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4zM5 3h2v2H5V3zm4 0h2v2H9V3zm4 0h2v2h-2V3zm4 0h2v2h-2V3zm0 4h2v2h-2V7zm0 4h2v2h-2v-2zm0 4h2v2h-2v-2zm-4 4h2v2h-2v-2zm-4 0h2v2H9v-2zm-4 0h2v2H5v-2zm0-4h2v2H5v-2zm0-4h2v2H5V7z'/%3E%3C/svg%3E"
+                alt="JSON Formatter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">JSON Formatter</h3>
+              <p class="tool-description">
+                Validate, beautify, and format JSON data.
+              </p>
+              <a href="json-formatter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Base64 Encoder Decoder"
+              data-tool-keywords="encode decode binary text"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M5 13h14v-2H5v2zm0 4h14v-2H5v2zm0-8h14V7H5v2zm16-4H3c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z'/%3E%3C/svg%3E"
+                alt="Base64 Encoder/Decoder"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Base64 Encoder/Decoder</h3>
+              <p class="tool-description">
+                Encode or decode data in Base64 format.
+              </p>
+              <a href="d.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="URL Encoder Decoder"
+              data-tool-keywords="percent encoding uri component"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M15.5 12c0-1.38-.84-2.54-2-3.03V7h-3v1.97c-1.16.49-2 1.65-2 3.03s.84 2.54 2 3.03V17h3v-1.97c1.16-.49 2-1.65 2-3.03zm-3.5-1.5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5-1.5-.67-1.5-1.5.67-1.5 1.5-1.5zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z'/%3E%3C/svg%3E"
+                alt="URL Encoder/Decoder"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">URL Encoder/Decoder</h3>
+              <p class="tool-description">
+                Encode or decode URLs for web use (percent-encoding).
+              </p>
+              <a href="url-encoder.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Color Picker"
+              data-tool-keywords="hex rgb hsl select color wheel"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z'/%3E%3C/svg%3E"
+                alt="Color Picker"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Color Picker</h3>
+              <p class="tool-description">
+                Pick colors from a visual selector (HEX, RGB, HSL).
+              </p>
+              <a href="color-picker.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Regex Tester"
+              data-tool-keywords="regular expression test debug match pattern"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M20.01 15.31L14.69 2.5c-.67-1.33-2.71-1.33-3.38 0L6 15.31l-.01.01c-.67 1.33.36 3.01 1.74 3.01h10.54c1.38 0 2.41-1.68 1.74-3.01l-.01-.01zM12 17c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm1-3h-2V7h2v7z'/%3E%3C/svg%3E"
+                alt="Regex Tester"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Regex Tester</h3>
+              <p class="tool-description">
+                Test and debug regular expressions with live matching.
+              </p>
+              <a href="regrex-tester.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="color-tools">
+        <div class="container">
+          <h2 class="category-title">🎨 Color Tools</h2>
+          <p class="category-description">
+            Explore, generate, and manage colors for your design projects
+            effectively.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="Color Picker from Image"
+              data-tool-keywords="extract color palette image upload eyedropper"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M17.08 15.58L12 20.66l-5.08-5.08C4.76 13.42 4 11.28 4 9c0-4.42 3.58-8 8-8s8 3.58 8 8c0 2.28-.76 4.42-1.92 6.58zM12 5c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z'/%3E%3C/svg%3E"
+                alt="Picker from Image"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Picker from Image</h3>
+              <p class="tool-description">
+                Extract dominant colors or a palette from an uploaded image.
+              </p>
+              <a href="picker-from-image.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="HEX to RGB Converter"
+              data-tool-keywords="convert color codes hexadecimal red green blue"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm-2-13h4v2h-4V7zm0 4h4v2h-4v-2zm0 4h4v2h-4v-2z'/%3E%3C/svg%3E"
+                alt="HEX to RGB"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">HEX to RGB Converter</h3>
+              <p class="tool-description">
+                Convert HEX color codes to RGB values and vice-versa.
+              </p>
+              <a href="h-to-r-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Gradient Generator"
+              data-tool-keywords="css color gradient linear radial create"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M11 9.16V2c-5 .5-9 4.79-9 10s4 9.5 9 10v-7.16c-1.68-.41-3-1.96-3-3.84 0-1.88 1.32-3.43 3-3.84zm2 0c1.68.41 3 1.96 3 3.84 0 1.88-1.32 3.43-3 3.84V20c5-.5 9-4.79 9-10s-4-9.5-9-10V9.16z'/%3E%3C/svg%3E"
+                alt="Gradient Generator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Gradient Generator</h3>
+              <p class="tool-description">
+                Create beautiful CSS color gradients (linear, radial).
+              </p>
+              <a href="gradient-generator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Contrast Checker"
+              data-tool-keywords="accessibility wcag color ratio text background"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6V6z'/%3E%3C/svg%3E"
+                alt="Contrast Checker"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Contrast Checker</h3>
+              <p class="tool-description">
+                Check color contrast ratio for accessibility (WCAG).
+              </p>
+              <a href="contrast-checker.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Palette Generator"
+              data-tool-keywords="color scheme harmonious create design"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 22C6.49 22 2 17.51 2 12S6.49 2 12 2s10 4.49 10 10-4.49 10-10 10zm5.71-15.29L12 12.41l-5.71-5.7L4.88 8.12 10.59 13.83l-1.42 1.41L3.46 9.54l-1.41 1.41L7.76 16.66l1.41-1.41L6.34 12.41l5.66-5.66 1.41 1.41-2.83 2.83 1.41 1.41 4.24-4.24 1.41 1.41-5.66 5.66 2.83 2.83L20.54 9.54l-1.42-1.42-3.41 3.41z'/%3E%3C/svg%3E"
+                alt="Palette Generator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Palette Generator</h3>
+              <p class="tool-description">
+                Create harmonious color palettes for your projects.
+              </p>
+              <a href="palette-generator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Color Blindness Simulator"
+              data-tool-keywords="accessibility vision deficiency test design"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z'/%3E%3C/svg%3E"
+                alt="Color Blindness Simulator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Color Blindness Simulator</h3>
+              <p class="tool-description">
+                Simulate how colors appear to users with color vision
+                deficiencies.
+              </p>
+              <a href="color-blind-simulator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="seo-tools">
+        <div class="container">
+          <h2 class="category-title">🌍 SEO & Marketing Tools</h2>
+          <p class="category-description">
+            Analyze and optimize your content for better search engine
+            visibility and marketing.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="Keyword Density Checker"
+              data-tool-keywords="seo content analysis frequency optimization"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M17.68 10.35c.39-.39.39-1.02 0-1.41L15.17 6.41a.996.996 0 00-1.41 0L10.34 9.83c-.4.4-.4 1.03 0 1.42l2.52 2.52c.39.39 1.02.39 1.41 0l3.41-3.42zM4 21h16c.55 0 1-.45 1-1V4c0-.55-.45-1-1-1H4c-.55 0-1 .45-1 1v16c0 .55.45 1 1 1zM6 5h12v12H6V5zm4.59 10.59L15 11.17l-2.12-2.12-4.42 4.42 1.41 1.41z'/%3E%3C/svg%3E"
+                alt="Keyword Density Checker"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Keyword Density Checker</h3>
+              <p class="tool-description">
+                Analyze keyword frequency in your text content.
+              </p>
+              <a href="keyword-density.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Meta Tag Analyzer"
+              data-tool-keywords="seo website title description analysis"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM11 7h2v2h-2V7zm0 4h2v6h-2v-6z'/%3E%3C/svg%3E"
+                alt="Meta Tag Analyzer"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Meta Tag Analyzer</h3>
+              <p class="tool-description">
+                Check and analyze website meta tags for SEO.
+              </p>
+              <a href="meta-tag-analyzer.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Word Counter SEO"
+              data-tool-keywords="character count content length seo marketing"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z'/%3E%3C/svg%3E"
+                alt="Word Counter for SEO"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Word Counter (SEO)</h3>
+              <p class="tool-description">
+                Track word and character count for optimal content length.
+              </p>
+              <a href="word-counter-seo.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tool-category" id="utility-tools">
+        <div class="container">
+          <h2 class="category-title">🛠️ Utility Tools</h2>
+          <p class="category-description">
+            A collection of handy utilities for various everyday digital tasks.
+          </p>
+          <div class="tool-grid">
+            <div
+              class="tool-card"
+              data-tool-name="QR Barcode Generator"
+              data-tool-keywords="qr code barcode generate scan"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M3 11h8V3H3v8zm2-6h4v4H5V5zm8-2h8v8h-8V3zm2 6h4v-4h-4v4zM3 21h8v-8H3v8zm2-6h4v4H5v-4zm13-2h-2v3h-3v2h3v3h2v-3h3v-2h-3v-3z'/%3E%3C/svg%3E"
+                alt="QR & Barcode Generator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">QR & Barcode Generator</h3>
+              <p class="tool-description">
+                Create QR codes and various types of barcodes.
+              </p>
+              <a href="QR-generator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="UUID Generator"
+              data-tool-keywords="universally unique identifier guid generate random id"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v6h-2zm0 8h2v2h-2z'/%3E%3C/svg%3E"
+                alt="UUID Generator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">UUID Generator</h3>
+              <p class="tool-description">
+                Generate universally unique identifiers (UUIDs/GUIDs).
+              </p>
+              <a href="uuid-generator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Unit Converter"
+              data-tool-keywords="length weight temperature volume area speed time"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M19.07 4.93a10 10 0 00-14.14 0 10 10 0 000 14.14 10 10 0 0014.14 0 10 10 0 000-14.14zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-13h2v2.25L16.25 9 15 10.25l-2.25-2.25V12h-1.5V7.75L9 10.25 7.75 9 11 5.75V5h2v2z'/%3E%3C/svg%3E"
+                alt="Unit Converter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Unit Converter</h3>
+              <p class="tool-description">
+                Convert various units (length, weight, temperature, etc.).
+              </p>
+              <a href="unit-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Time Zone Converter"
+              data-tool-keywords="world clock time difference gmt utc"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z'/%3E%3C/svg%3E"
+                alt="Time Zone Converter"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Time Zone Converter</h3>
+              <p class="tool-description">
+                Convert times between different global time zones.
+              </p>
+              <a href="time-zone-converter.html" class="tool-button button-like">Use Tool</a>
+            </div>
+            <div
+              class="tool-card"
+              data-tool-name="Random Number Password Generator"
+              data-tool-keywords="generate secure random strong password number"
+            >
+              <img
+                src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='currentColor'%3E%3Cpath d='M16.5 10.5h-2v-2h2v2zm-3 0h-2v-2h2v2zm-3 0h-2v-2h2v2zm9-6H4.5c-1.11 0-1.99.89-1.99 2L2.5 18c0 1.11.89 2 2 2h15c1.11 0 2-.89 2-2V6.5c0-1.11-.89-2-2-2zm0 13.5H4.5V6.5h15v11.5zM9 16.5h6v-1.5H9v1.5z'/%3E%3C/svg%3E"
+                alt="Random Number/Password Generator"
+                class="tool-icon"
+                loading="lazy"
+              />
+              <h3 class="tool-name">Random Generator</h3>
+              <p class="tool-description">
+                Generate random numbers or secure passwords.
+              </p>
+              <a href="random-generator.html" class="tool-button button-like">Use Tool</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer id="main-footer">
+      <div class="container footer-container">
+        <div class="footer-branding">
+          <div class="logo">Utility Pro</div>
+          <p class="tagline">Simplifying your digital life.</p>
+        </div>
+        <div class="footer-contact-info">
+          <p>Contact Us:</p>
+          <a href="mailto:work.kashif7@gmail.com">work.kashif7@gmail.com</a>
+        </div>
+        <div class="footer-links">
+          <a href="/privacy-policy">Privacy Policy</a>
+          <span>|</span>
+          <a href="/terms-of-use">Terms of Use</a>
+        </div>
+        <div class="theme-toggle-container">
+          <button
+            id="theme-toggle"
+            aria-label="Toggle light/dark theme"
+            class="button-like"
+          >
+            <span class="sun-icon" role="img" aria-label="Light mode icon"
+              >☀️</span
+            >
+            <span class="moon-icon" role="img" aria-label="Dark mode icon"
+              >🌙</span
+            >
+          </button>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <p>
+          &copy; <span id="current-year"></span> Utility Pro All rights
+          reserved.
+        </p>
+      </div>
+    </footer>
+
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const header = document.getElementById("main-header");
+        const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+        const mainNav = document.getElementById("main-navigation");
+        const navLinks = document.querySelectorAll(
+          ".main-nav .nav-link, .cta-button"
+        );
+        const searchInput = document.getElementById("tool-search");
+        const toolCards = document.querySelectorAll(".tool-card");
+        const toolCategories = document.querySelectorAll(".tool-category");
+        const themeToggleButton = document.getElementById("theme-toggle");
+        const currentYearSpan = document.getElementById("current-year");
+
+        // Set current year in footer
+        if (currentYearSpan) {
+          currentYearSpan.textContent = new Date().getFullYear();
+        }
+
+        // Sticky Header
+        let lastScrollTop = 0;
+        window.addEventListener(
+          "scroll",
+          function () {
+            let scrollTop =
+              window.pageYOffset || document.documentElement.scrollTop;
+            if (scrollTop > 50) {
+              header.classList.add("scrolled");
+            } else {
+              header.classList.remove("scrolled");
+            }
+            // Active Nav Link Highlighting on Scroll
+            let currentSection = "";
+            const sections = document.querySelectorAll("section[id]");
+            sections.forEach((section) => {
+              const sectionTop = section.offsetTop - header.offsetHeight - 50; // Adjusted offset
+              if (scrollTop >= sectionTop) {
+                currentSection = section.getAttribute("id");
+              }
+            });
+            navLinks.forEach((link) => {
+              link.classList.remove("active");
+              if (
+                link.getAttribute("href") === "#" + currentSection ||
+                (currentSection === "hero" &&
+                  link.getAttribute("href") === "#hero")
+              ) {
+                link.classList.add("active");
+              } else if (
+                !currentSection &&
+                link.getAttribute("href") === "#hero"
+              ) {
+                // Default to Home if at top
+                link.classList.add("active");
+              }
+            });
+
+            lastScrollTop = scrollTop <= 0 ? 0 : scrollTop;
+          },
+          false
+        );
+
+        // Mobile Menu Toggle
+        if (mobileMenuToggle && mainNav) {
+          mobileMenuToggle.addEventListener("click", function () {
+            mainNav.classList.toggle("active");
+            const isExpanded = mainNav.classList.contains("active");
+            this.setAttribute("aria-expanded", isExpanded);
+            this.classList.toggle("active");
+          });
+        }
+
+        // Smooth Scroll for Nav Links & CTA
+        navLinks.forEach((link) => {
+          link.addEventListener("click", function (e) {
+            const href = this.getAttribute("href");
+            if (href && href.startsWith("#")) {
+              e.preventDefault();
+              const targetId = href.substring(1);
+              const targetElement = document.getElementById(targetId);
+              if (targetElement) {
+                let headerOffset = header.offsetHeight;
+                if (targetId === "hero") headerOffset = 0; // No offset for hero typically
+
+                let elementPosition = targetElement.getBoundingClientRect().top;
+                let offsetPosition =
+                  elementPosition + window.pageYOffset - headerOffset;
+
+                window.scrollTo({
+                  top: offsetPosition,
+                  behavior: "smooth",
+                });
+
+                // Close mobile nav if open and it's a nav link
+                if (
+                  mainNav.classList.contains("active") &&
+                  this.classList.contains("nav-link")
+                ) {
+                  mainNav.classList.remove("active");
+                  mobileMenuToggle.classList.remove("active");
+                  mobileMenuToggle.setAttribute("aria-expanded", "false");
+                }
+                // Update active class immediately
+                navLinks.forEach((nav) => nav.classList.remove("active"));
+                this.classList.add("active");
+              }
+            }
+          });
+        });
+
+        // Live Search/Filter
+        if (searchInput) {
+          searchInput.addEventListener("input", function () {
+            // 'input' for real-time
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            let anyCategoryVisible = false;
+
+            toolCategories.forEach((category) => {
+              let categoryHasVisibleCards = false;
+              const cardsInCategory = category.querySelectorAll(".tool-card");
+
+              cardsInCategory.forEach((card) => {
+                const toolName = card.dataset.toolName
+                  ? card.dataset.toolName.toLowerCase()
+                  : "";
+                const toolKeywords = card.dataset.toolKeywords
+                  ? card.dataset.toolKeywords.toLowerCase()
+                  : "";
+                const toolDescription = card.querySelector(".tool-description")
+                  ? card
+                      .querySelector(".tool-description")
+                      .textContent.toLowerCase()
+                  : "";
+
+                const isMatch =
+                  toolName.includes(searchTerm) ||
+                  toolKeywords.includes(searchTerm) ||
+                  toolDescription.includes(searchTerm);
+
+                if (isMatch) {
+                  card.style.display = ""; // Reset to CSS default (flex/grid item)
+                  categoryHasVisibleCards = true;
+                  anyCategoryVisible = true;
+                } else {
+                  card.style.display = "none";
+                }
+              });
+
+              // Show/hide category based on visible cards
+              if (categoryHasVisibleCards) {
+                category.style.display = "";
+              } else {
+                category.style.display = "none";
+              }
+            });
+            // If search term is empty, reset all to visible
+            if (searchTerm === "") {
+              toolCategories.forEach((category) => {
+                category.style.display = "";
+                category.querySelectorAll(".tool-card").forEach((card) => {
+                  card.style.display = "";
+                });
+              });
+            }
+          });
+        }
+
+        // Intersection Observer for Scroll Animations
+        const revealElements = document.querySelectorAll(
+          ".tool-category, .tool-card, #main-footer"
+        );
+        const revealObserver = new IntersectionObserver(
+          (entries, observer) => {
+            entries.forEach((entry, index) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("visible");
+                if (entry.target.classList.contains("tool-card")) {
+                  const parentGrid = entry.target.closest(".tool-grid");
+                  if (parentGrid) {
+                    const cardsInGrid = Array.from(parentGrid.children).filter(
+                      (el) => !el.classList.contains("visible")
+                    ); // only non-visible
+                    const cardIndex = cardsInGrid.indexOf(entry.target);
+                    entry.target.style.transitionDelay = `${cardIndex * 0.05}s`; // Stagger
+                  }
+                }
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+
+        revealElements.forEach((el) => {
+          revealObserver.observe(el);
+        });
+
+        // Light/Dark Mode Toggle
+        if (themeToggleButton) {
+          const sunIcon = themeToggleButton.querySelector(".sun-icon");
+          const moonIcon = themeToggleButton.querySelector(".moon-icon");
+
+          const applyTheme = (theme) => {
+            if (theme === "dark") {
+              document.body.classList.add("dark-mode");
+              if (sunIcon) sunIcon.style.display = "none";
+              if (moonIcon) moonIcon.style.display = "inline-block";
+            } else {
+              document.body.classList.remove("dark-mode");
+              if (sunIcon) sunIcon.style.display = "inline-block";
+              if (moonIcon) moonIcon.style.display = "none";
+            }
+          };
+
+          // Check for saved theme preference or OS preference
+          let currentTheme = localStorage.getItem("theme");
+          if (!currentTheme) {
+            currentTheme = window.matchMedia("(prefers-color-scheme: dark)")
+              .matches
+              ? "dark"
+              : "light";
+          }
+          applyTheme(currentTheme);
+
+          themeToggleButton.addEventListener("click", function () {
+            document.body.classList.toggle("dark-mode");
+            let newTheme = document.body.classList.contains("dark-mode")
+              ? "dark"
+              : "light";
+            localStorage.setItem("theme", newTheme);
+            applyTheme(newTheme);
+          });
+
+          // Listen for OS theme changes
+          window
+            .matchMedia("(prefers-color-scheme: dark)")
+            .addEventListener("change", (e) => {
+              if (!localStorage.getItem("theme")) {
+                // Only if no user override
+                const newColorScheme = e.matches ? "dark" : "light";
+                applyTheme(newColorScheme);
+              }
+            });
+        }
+
+        // Fallback for lazy loading images if native isn't supported (though it mostly is now)
+        // You might use a more robust library for this if needed.
+        // This example assumes native `loading="lazy"` is sufficient.
+      });
+    </script>
+  </body>
+</html>

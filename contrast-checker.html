@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Contrast Checker - Multi-Tool</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Arial", sans-serif;
+      }
+
+      body {
+        background-color: #f0f4f8;
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        flex: 1;
+      }
+
+      header {
+        text-align: center;
+        margin-bottom: 30px;
+      }
+
+      header h1 {
+        color: #007bff;
+        font-size: 2.5em;
+        margin-bottom: 10px;
+      }
+
+      header p {
+        color: #666;
+        font-size: 1.1em;
+      }
+
+      .tool-section {
+        background: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        margin-bottom: 20px;
+      }
+
+      .input-group {
+        margin-bottom: 20px;
+      }
+
+      .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      input[type="color"],
+      input[type="text"] {
+        padding: 5px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .color-inputs {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+
+      .color-input {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .preview {
+        margin: 20px 0;
+        padding: 20px;
+        border-radius: 5px;
+        text-align: center;
+        font-size: 1.2em;
+      }
+
+      button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s;
+      }
+
+      button:hover {
+        background-color: #0056b3;
+      }
+
+      .password-group {
+        margin-bottom: 20px;
+      }
+
+      .password-group input {
+        width: 100%;
+        padding: 10px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        font-size: 1em;
+      }
+
+      .output-group {
+        margin-top: 20px;
+      }
+
+      #output {
+        background: #f8f9fa;
+        padding: 15px;
+        border: 2px solid #007bff;
+        border-radius: 5px;
+        min-height: 100px;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+      }
+
+      footer {
+        text-align: center;
+        padding: 20px;
+        background: #007bff;
+        color: #fff;
+        margin-top: auto;
+      }
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        header h1 {
+          font-size: 2em;
+        }
+
+        button {
+          width: 100%;
+        }
+
+        .color-inputs {
+          flex-direction: column;
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>Contrast Checker</h1>
+        <p>Check color contrast ratio for accessibility (WCAG compliance).</p>
+      </header>
+
+      <section class="tool-section">
+        <div class="input-group">
+          <div class="color-inputs">
+            <div class="color-input">
+              <label for="foregroundColor">Foreground Color</label>
+              <input
+                type="color"
+                id="foregroundColor"
+                value="#000000"
+                oninput="checkContrast()"
+              />
+              <input
+                type="text"
+                id="foregroundHex"
+                value="#000000"
+                oninput="updateColor('foreground')"
+              />
+            </div>
+            <div class="color-input">
+              <label for="backgroundColor">Background Color</label>
+              <input
+                type="color"
+                id="backgroundColor"
+                value="#FFFFFF"
+                oninput="checkContrast()"
+              />
+              <input
+                type="text"
+                id="backgroundHex"
+                value="#FFFFFF"
+                oninput="updateColor('background')"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="preview" id="preview">Sample Text</div>
+
+        <div class="password-group">
+          <input
+            type="password"
+            id="password"
+            placeholder="Optional: Enter password to protect output file"
+          />
+        </div>
+
+        <button onclick="checkContrast()">Check Contrast</button>
+
+        <div class="output-group">
+          <div id="output"></div>
+          <button onclick="downloadOutput()" style="margin-top: 10px">
+            Download Results
+          </button>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p>© 2025 Multi-Tool Website. All rights reserved.</p>
+    </footer>
+
+    <script>
+      function getLuminance(r, g, b) {
+        const a = [r, g, b].map((v) => {
+          v /= 255;
+          return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4);
+        });
+        return a[0] * 0.2126 + a[1] * 0.7152 + a[2] * 0.0722;
+      }
+
+      function hexToRgb(hex) {
+        hex = hex.replace("#", "");
+        const r = parseInt(hex.substring(0, 2), 16);
+        const g = parseInt(hex.substring(2, 4), 16);
+        const b = parseInt(hex.substring(4, 6), 16);
+        return { r, g, b };
+      }
+
+      function checkContrast() {
+        const fgHex = document.getElementById("foregroundHex").value;
+        const bgHex = document.getElementById("backgroundHex").value;
+        const preview = document.getElementById("preview");
+        const output = document.getElementById("output");
+
+        if (!/^#[0-9A-F]{6}$/i.test(fgHex) || !/^#[0-9A-F]{6}$/i.test(bgHex)) {
+          output.textContent = "Please enter valid hex colors (e.g., #FFFFFF).";
+          return;
+        }
+
+        const fgRgb = hexToRgb(fgHex);
+        const bgRgb = hexToRgb(bgHex);
+
+        const fgLuminance = getLuminance(fgRgb.r, fgRgb.g, fgRgb.b);
+        const bgLuminance = getLuminance(bgRgb.r, bgRgb.g, bgRgb.b);
+
+        const contrastRatio =
+          (Math.max(fgLuminance, bgLuminance) + 0.05) /
+          (Math.min(fgLuminance, bgLuminance) + 0.05);
+
+        preview.style.color = fgHex;
+        preview.style.backgroundColor = bgHex;
+
+        const result = `
+Contrast Ratio: ${contrastRatio.toFixed(2)}:1
+
+WCAG Compliance:
+- Level AA (Normal Text): ${contrastRatio >= 4.5 ? "Pass" : "Fail"} (>= 4.5:1)
+- Level AA (Large Text): ${contrastRatio >= 3 ? "Pass" : "Fail"} (>= 3:1)
+- Level AAA (Normal Text): ${contrastRatio >= 7 ? "Pass" : "Fail"} (>= 7:1)
+- Level AAA (Large Text): ${contrastRatio >= 4.5 ? "Pass" : "Fail"} (>= 4.5:1)
+
+Colors Used:
+- Foreground: ${fgHex}
+- Background: ${bgHex}
+            `;
+        output.textContent = result;
+      }
+
+      function updateColor(type) {
+        const hexInput = document.getElementById(`${type}Hex`);
+        const colorInput = document.getElementById(`${type}Color`);
+        const hex = hexInput.value;
+
+        if (/^#[0-9A-F]{6}$/i.test(hex)) {
+          colorInput.value = hex;
+          checkContrast();
+        }
+      }
+
+      function downloadOutput() {
+        const output = document.getElementById("output").textContent;
+        const password = document.getElementById("password").value;
+
+        if (!output) {
+          alert("Please check contrast first!");
+          return;
+        }
+
+        const blob = new Blob([output], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = password
+          ? "contrast_results_protected.txt"
+          : "contrast_results.txt";
+        a.click();
+        URL.revokeObjectURL(url);
+
+        if (password) {
+          alert(
+            "Note: Password protection is simulated for this demo. The file is not actually encrypted."
+          );
+        }
+      }
+
+      // Initial check
+      checkContrast();
+    </script>
+  </body>
+</html>

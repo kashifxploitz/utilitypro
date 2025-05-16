@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Keyword Density Checker</title>
+    <style>
+      /* General Styles */
+      body {
+        font-family: "Arial", sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f0f8ff; /* Light blue background */
+        color: #333;
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        box-sizing: border-box;
+      }
+
+      .container {
+        background-color: #ffffff; /* White background */
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        max-width: 900px;
+        width: 100%;
+        text-align: center;
+        box-sizing: border-box;
+        border: 1px solid #e0e0e0; /* Light border */
+      }
+
+      h1 {
+        color: #007bff; /* Bright blue for headings */
+        margin-bottom: 25px;
+        font-size: 2.5em;
+        font-weight: 700;
+      }
+
+      p {
+        margin-bottom: 20px;
+        font-size: 1.1em;
+        color: #555;
+      }
+
+      /* Input Area */
+      textarea {
+        width: calc(100% - 20px);
+        height: 250px;
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #add8e6; /* Light blue border */
+        border-radius: 8px;
+        font-size: 1.1em;
+        resize: vertical;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.08);
+        transition: border-color 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: #007bff;
+      }
+
+      /* Buttons */
+      .btn-group {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        background-color: #007bff; /* Bright blue button */
+        color: white;
+        padding: 14px 28px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.3);
+        flex-grow: 1;
+        max-width: 200px;
+      }
+
+      button:hover {
+        background-color: #0056b3; /* Darker blue on hover */
+        transform: translateY(-2px);
+      }
+
+      button:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 5px rgba(0, 123, 255, 0.2);
+      }
+
+      input[type="file"] {
+        display: none; /* Hide default file input */
+      }
+
+      .upload-btn-wrapper {
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+      }
+
+      .upload-btn-wrapper button {
+        background-color: #28a745; /* Green for upload */
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.3);
+      }
+
+      .upload-btn-wrapper button:hover {
+        background-color: #218838;
+      }
+
+      /* Results Area */
+      #results {
+        background-color: #f9f9f9;
+        border: 1px solid #add8e6;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: left;
+        min-height: 100px;
+        max-height: 500px;
+        overflow-y: auto;
+        margin-top: 20px;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+      }
+
+      #results h2 {
+        color: #007bff;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 1.8em;
+      }
+
+      #results table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 15px;
+      }
+
+      #results th,
+      #results td {
+        border: 1px solid #e0e0e0;
+        padding: 12px;
+        text-align: left;
+        font-size: 1em;
+      }
+
+      #results th {
+        background-color: #e6f7ff; /* Lightest blue for table header */
+        color: #007bff;
+        font-weight: bold;
+      }
+
+      #results tr:nth-child(even) {
+        background-color: #f0faff; /* Very light blue for even rows */
+      }
+
+      /* Password Protection Overlay */
+      .overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.6);
+        backdrop-filter: blur(5px);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .password-prompt {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+        text-align: center;
+        max-width: 400px;
+        width: 90%;
+      }
+
+      .password-prompt h3 {
+        color: #007bff;
+        margin-bottom: 20px;
+        font-size: 1.6em;
+      }
+
+      .password-prompt input[type="password"] {
+        width: calc(100% - 20px);
+        padding: 12px;
+        margin-bottom: 20px;
+        border: 1px solid #add8e6;
+        border-radius: 8px;
+        font-size: 1.1em;
+      }
+
+      .password-prompt button {
+        width: auto;
+        padding: 10px 20px;
+        font-size: 1em;
+      }
+
+      .error-message {
+        color: #dc3545; /* Red for error messages */
+        margin-top: 10px;
+        font-weight: bold;
+      }
+
+      /* Download Link */
+      #downloadLink {
+        display: none; /* Hidden by default */
+        margin-top: 20px;
+        padding: 12px 25px;
+        background-color: #17a2b8; /* Info blue for download */
+        color: white;
+        text-decoration: none;
+        border-radius: 8px;
+        font-size: 1.1em;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        box-shadow: 0 4px 10px rgba(23, 162, 184, 0.3);
+        display: inline-block;
+      }
+
+      #downloadLink:hover {
+        background-color: #138496;
+        transform: translateY(-2px);
+      }
+
+      /* Loader */
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #007bff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 20px auto;
+        display: none; /* Hidden by default */
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* Mobile Responsiveness */
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+
+        .container {
+          padding: 20px;
+          border-radius: 8px;
+        }
+
+        h1 {
+          font-size: 2em;
+          margin-bottom: 20px;
+        }
+
+        p {
+          font-size: 1em;
+          margin-bottom: 15px;
+        }
+
+        textarea {
+          height: 200px;
+          padding: 10px;
+          font-size: 1em;
+        }
+
+        button {
+          padding: 12px 20px;
+          font-size: 1em;
+          flex-grow: unset;
+          width: 100%;
+          max-width: 250px;
+        }
+
+        .btn-group {
+          flex-direction: column;
+          gap: 10px;
+        }
+
+        #results {
+          padding: 15px;
+        }
+
+        #results h2 {
+          font-size: 1.5em;
+        }
+
+        #results th,
+        #results td {
+          padding: 8px;
+          font-size: 0.9em;
+        }
+
+        .password-prompt {
+          padding: 20px;
+        }
+
+        .password-prompt h3 {
+          font-size: 1.4em;
+        }
+
+        .password-prompt input[type="password"] {
+          padding: 10px;
+          font-size: 1em;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 1.8em;
+        }
+
+        p {
+          font-size: 0.9em;
+        }
+
+        textarea {
+          height: 150px;
+        }
+
+        button {
+          padding: 10px 15px;
+          font-size: 0.95em;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1>Keyword Density Checker</h1>
+      <p>
+        Analyze the frequency of keywords in your text content to optimize for
+        SEO.
+      </p>
+
+      <textarea
+        id="textContent"
+        placeholder="Paste your text content here or upload a .txt file..."
+      ></textarea>
+
+      <div class="btn-group">
+        <div class="upload-btn-wrapper">
+          <button
+            type="button"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            Upload .txt File
+          </button>
+          <input type="file" id="fileInput" accept=".txt" />
+        </div>
+        <button onclick="checkDensity()">Analyze Text</button>
+        <button onclick="clearContent()">Clear Content</button>
+      </div>
+
+      <div class="loader" id="loader"></div>
+
+      <div id="results">
+        <h2>Analysis Results</h2>
+        <p id="wordCount">Total words: 0</p>
+        <p id="uniqueWordCount">Unique words: 0</p>
+        <table>
+          <thead>
+            <tr>
+              <th>Keyword</th>
+              <th>Frequency</th>
+              <th>Density (%)</th>
+            </tr>
+          </thead>
+          <tbody id="densityTableBody">
+            <tr>
+              <td colspan="3">
+                No results yet. Enter text and click "Analyze Text".
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <a id="downloadLink" href="#" download="keyword_density_report.txt"
+        >Download Report</a
+      >
+    </div>
+
+    <div class="overlay" id="passwordOverlay">
+      <div class="password-prompt">
+        <h3>Enter Password to Download</h3>
+        <input
+          type="password"
+          id="passwordInput"
+          placeholder="Enter password"
+        />
+        <p class="error-message" id="passwordError"></p>
+        <button onclick="verifyPassword()">Submit</button>
+        <button
+          onclick="closePasswordPrompt()"
+          style="background-color: #6c757d; margin-left: 10px"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
+
+    <script>
+      // Simple password for demonstration. In a real application, consider more robust security.
+      const DOWNLOAD_PASSWORD = "yourpassword123"; // CHANGE THIS TO A SECURE PASSWORD!
+
+      document
+        .getElementById("fileInput")
+        .addEventListener("change", handleFileUpload);
+
+      function handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            document.getElementById("textContent").value = e.target.result;
+            checkDensity(); // Automatically analyze after upload
+          };
+          reader.readAsText(file);
+        }
+      }
+
+      function checkDensity() {
+        const textContent = document.getElementById("textContent").value.trim();
+        const resultsDiv = document.getElementById("results");
+        const densityTableBody = document.getElementById("densityTableBody");
+        const wordCountElem = document.getElementById("wordCount");
+        const uniqueWordCountElem = document.getElementById("uniqueWordCount");
+        const loader = document.getElementById("loader");
+        const downloadLink = document.getElementById("downloadLink");
+
+        // Hide previous download link and show loader
+        downloadLink.style.display = "none";
+        loader.style.display = "block";
+        densityTableBody.innerHTML = ""; // Clear previous results
+
+        if (textContent === "") {
+          densityTableBody.innerHTML =
+            '<tr><td colspan="3">Please enter some text to analyze.</td></tr>';
+          wordCountElem.textContent = "Total words: 0";
+          uniqueWordCountElem.textContent = "Unique words: 0";
+          loader.style.display = "none";
+          return;
+        }
+
+        // Simulate a slight delay for loader visibility
+        setTimeout(() => {
+          const words = textContent.toLowerCase().match(/\b\w+\b/g); // Get words, filter out punctuation
+          if (!words) {
+            densityTableBody.innerHTML =
+              '<tr><td colspan="3">No words found in the text.</td></tr>';
+            wordCountElem.textContent = "Total words: 0";
+            uniqueWordCountElem.textContent = "Unique words: 0";
+            loader.style.display = "none";
+            return;
+          }
+
+          const totalWords = words.length;
+          const wordFrequency = {};
+
+          words.forEach((word) => {
+            wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+          });
+
+          const sortedKeywords = Object.entries(wordFrequency).sort(
+            ([, countA], [, countB]) => countB - countA
+          );
+
+          wordCountElem.textContent = `Total words: ${totalWords}`;
+          uniqueWordCountElem.textContent = `Unique words: ${sortedKeywords.length}`;
+
+          if (sortedKeywords.length === 0) {
+            densityTableBody.innerHTML =
+              '<tr><td colspan="3">No keywords found.</td></tr>';
+          } else {
+            sortedKeywords.forEach(([keyword, frequency]) => {
+              const density = ((frequency / totalWords) * 100).toFixed(2);
+              const row = densityTableBody.insertRow();
+              row.innerHTML = `
+                            <td>${keyword}</td>
+                            <td>${frequency}</td>
+                            <td>${density}%</td>
+                        `;
+            });
+          }
+
+          generateDownloadReport(sortedKeywords, totalWords);
+          loader.style.display = "none";
+        }, 500); // 0.5 second delay
+      }
+
+      function clearContent() {
+        document.getElementById("textContent").value = "";
+        document.getElementById("densityTableBody").innerHTML =
+          '<tr><td colspan="3">No results yet. Enter text and click "Analyze Text".</td></tr>';
+        document.getElementById("wordCount").textContent = "Total words: 0";
+        document.getElementById("uniqueWordCount").textContent =
+          "Unique words: 0";
+        document.getElementById("downloadLink").style.display = "none";
+      }
+
+      let reportContent = ""; // Variable to store the content for download
+
+      function generateDownloadReport(keywords, totalWords) {
+        let report = `Keyword Density Analysis Report\n\n`;
+        report += `Total words: ${totalWords}\n`;
+        report += `Unique words: ${keywords.length}\n\n`;
+        report += `Keyword | Frequency | Density (%)\n`;
+        report += `-----------------------------------\n`;
+
+        keywords.forEach(([keyword, frequency]) => {
+          const density = ((frequency / totalWords) * 100).toFixed(2);
+          report += `${keyword.padEnd(10)} | ${String(frequency).padEnd(
+            9
+          )} | ${density}%\n`;
+        });
+        reportContent = report;
+        document.getElementById("downloadLink").style.display = "inline-block";
+        // The download link's href will be set when the password is verified
+      }
+
+      function showPasswordPrompt() {
+        document.getElementById("passwordOverlay").style.display = "flex";
+        document.getElementById("passwordInput").value = ""; // Clear previous input
+        document.getElementById("passwordError").textContent = ""; // Clear previous error
+        document.getElementById("passwordInput").focus(); // Focus on the input
+      }
+
+      function closePasswordPrompt() {
+        document.getElementById("passwordOverlay").style.display = "none";
+      }
+
+      function verifyPassword() {
+        const enteredPassword = document.getElementById("passwordInput").value;
+        const passwordError = document.getElementById("passwordError");
+        const downloadLink = document.getElementById("downloadLink");
+
+        if (enteredPassword === DOWNLOAD_PASSWORD) {
+          const blob = new Blob([reportContent], { type: "text/plain" });
+          downloadLink.href = URL.createObjectURL(blob);
+          downloadLink.click(); // Trigger download
+          URL.revokeObjectURL(downloadLink.href); // Clean up the URL object
+          closePasswordPrompt();
+        } else {
+          passwordError.textContent = "Incorrect password. Please try again.";
+        }
+      }
+
+      // Event listener for the download button (which now triggers the password prompt)
+      document
+        .getElementById("downloadLink")
+        .addEventListener("click", function (e) {
+          // Only prevent default if we have content to download and it's not already set as an object URL
+          if (reportContent && !this.href.startsWith("blob:")) {
+            e.preventDefault(); // Stop immediate download
+            showPasswordPrompt();
+          }
+          // If href is already a blob URL (meaning password was correct), allow default action
+        });
+
+      // Initialize display for the download link
+      document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("downloadLink").style.display = "none";
+      });
+    </script>
+  </body>
+</html>

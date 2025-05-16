@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Encryptor/Decryptor - Your Multi-Tool Website</title>
+    <style>
+      /* Basic Reset and Body Styling */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+          "Segoe UI Symbol";
+        margin: 0;
+        padding: 0;
+        background-color: #f4f7f6; /* Light grey background */
+        color: #333; /* Dark grey text */
+        line-height: 1.6;
+      }
+
+      .container {
+        max-width: 900px;
+        margin: 20px auto;
+        padding: 0 15px; /* Padding on sides for mobile */
+      }
+
+      /* Header Styling */
+      header {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 15px 0;
+        text-align: center;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      header h1 {
+        margin: 0;
+        font-size: 2em;
+      }
+
+      /* Tool Section Styling */
+      .tool-section {
+        background-color: #fff; /* White background */
+        padding: 25px;
+        margin-top: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      }
+
+      .tool-section h2 {
+        color: #1e88e5; /* Bright Blue */
+        margin-top: 0;
+        border-bottom: 2px solid #e0e0e0; /* Light grey border */
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+
+      /* Form Group Styling */
+      .form-group {
+        margin-bottom: 15px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+        color: #555;
+      }
+
+      textarea,
+      input[type="text"],
+      input[type="password"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 1em;
+        resize: vertical; /* Allow vertical resizing for textareas */
+      }
+
+      /* Radio Buttons */
+      .radio-group {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+        margin-bottom: 15px;
+        flex-wrap: wrap; /* Allow wrapping on small screens */
+      }
+
+      .radio-group label {
+        display: flex;
+        align-items: center;
+        font-weight: normal;
+        margin-bottom: 0;
+        cursor: pointer;
+      }
+
+      .radio-group input[type="radio"] {
+        margin-right: 8px;
+        cursor: pointer;
+        width: auto; /* Override default input width */
+      }
+
+      /* Buttons */
+      .button-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 20px;
+        justify-content: flex-start;
+      }
+
+      button {
+        background-color: #1e88e5; /* Bright Blue */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+        flex-grow: 1; /* Allow buttons to grow */
+        min-width: 120px; /* Minimum width for buttons */
+      }
+
+      button:hover {
+        background-color: #1565c0; /* Darker Blue on hover */
+      }
+
+      button:disabled {
+        background-color: #b0bec5; /* Grey when disabled */
+        cursor: not-allowed;
+      }
+
+      /* Output Textarea */
+      #outputTextArea {
+        background-color: #e0e0e0; /* Light grey for output */
+        cursor: default;
+        margin-top: 20px;
+      }
+
+      /* Error Message */
+      #errorMessage {
+        margin-top: 20px;
+        padding: 10px 15px;
+        background-color: #ffebee; /* Light red */
+        border: 1px solid #ef9a9a; /* Lighter red border */
+        color: #c62828; /* Dark red text */
+        border-radius: 4px;
+        display: none; /* Hidden by default */
+        font-weight: bold;
+      }
+
+      /* Security Disclaimer */
+      .security-disclaimer {
+        background-color: #ffeb3b; /* Yellow background */
+        color: #333;
+        padding: 15px;
+        border-radius: 8px;
+        margin-top: 20px;
+        border: 1px solid #fbc02d; /* Darker yellow border */
+        font-size: 0.9em;
+        line-height: 1.5;
+      }
+      .security-disclaimer strong {
+        color: #d32f2f; /* Red for emphasis */
+      }
+
+      /* Responsive Design */
+      @media (max-width: 600px) {
+        header h1 {
+          font-size: 1.5em;
+        }
+
+        .tool-section {
+          padding: 15px;
+        }
+
+        .radio-group {
+          flex-direction: column; /* Stack radio buttons vertically */
+          gap: 10px;
+        }
+
+        .button-group {
+          flex-direction: column; /* Stack buttons vertically */
+          gap: 10px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <h1>Encryptor / Decryptor</h1>
+      </div>
+    </header>
+
+    <div class="container">
+      <div class="tool-section">
+        <h2>Encrypt or Decrypt Text Messages</h2>
+
+        <div class="security-disclaimer">
+          <strong>Important Security Notice:</strong> This tool uses the
+          **Vigenere Cipher** for encryption and decryption. The Vigenere Cipher
+          is a *historic* cipher and is **NOT secure** against modern
+          cryptographic attacks. It should **NEVER** be used for sensitive or
+          confidential information. This tool is provided for educational
+          purposes and demonstrating cipher concepts only.
+        </div>
+
+        <div class="form-group" style="margin-top: 25px">
+          <label for="inputText">Input Text:</label>
+          <textarea
+            id="inputText"
+            rows="8"
+            placeholder="Enter text to encrypt or decrypt..."
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="cipherKey">Cipher Key (Password):</label>
+          <input
+            type="password"
+            id="cipherKey"
+            placeholder="Enter your secret key..."
+          />
+        </div>
+
+        <div class="radio-group">
+          <label>
+            <input type="radio" name="operation" value="encrypt" checked />
+            Encrypt
+          </label>
+          <label>
+            <input type="radio" name="operation" value="decrypt" /> Decrypt
+          </label>
+        </div>
+
+        <div class="button-group">
+          <button id="loadFileBtn">Load from File</button>
+          <button id="processBtn">Process Text</button>
+          <button id="saveFileBtn">Save to File</button>
+        </div>
+
+        <div id="errorMessage" style="display: none"></div>
+
+        <div class="form-group">
+          <label for="outputTextArea">Output Text:</label>
+          <textarea
+            id="outputTextArea"
+            rows="8"
+            readonly
+            placeholder="Result will appear here..."
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const inputTextarea = document.getElementById("inputText");
+      const cipherKeyInput = document.getElementById("cipherKey");
+      const encryptRadio = document.querySelector('input[value="encrypt"]');
+      const decryptRadio = document.querySelector('input[value="decrypt"]');
+      const loadFileBtn = document.getElementById("loadFileBtn");
+      const processBtn = document.getElementById("processBtn");
+      const saveFileBtn = document.getElementById("saveFileBtn");
+      const outputTextArea = document.getElementById("outputTextArea");
+      const errorMessageDiv = document.getElementById("errorMessage");
+
+      // Create a hidden file input for loading files
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = ".txt"; // Only accept text files
+      fileInput.style.display = "none"; // Hide it
+      document.body.appendChild(fileInput);
+
+      // --- Utility Functions ---
+
+      function displayError(message) {
+        errorMessageDiv.textContent = message;
+        errorMessageDiv.style.display = "block";
+      }
+
+      function clearError() {
+        errorMessageDiv.textContent = "";
+        errorMessageDiv.style.display = "none";
+      }
+
+      // --- Vigenere Cipher Logic ---
+      function cleanKey(key) {
+        return key.toUpperCase().replace(/[^A-Z]/g, ""); // Only use alphabet chars, uppercase
+      }
+
+      function vigenereProcess(text, key, isEncrypt) {
+        if (!text) return "";
+        const cleanedKey = cleanKey(key);
+        if (!cleanedKey) {
+          throw new Error(
+            "Cipher Key cannot be empty or contain only non-alphabet characters."
+          );
+        }
+
+        let result = "";
+        let keyIndex = 0;
+
+        for (let i = 0; i < text.length; i++) {
+          const char = text[i];
+          const charCode = char.charCodeAt(0);
+
+          if (char >= "A" && char <= "Z") {
+            const keyShift =
+              cleanedKey.charCodeAt(keyIndex % cleanedKey.length) -
+              "A".charCodeAt(0);
+            let shiftedCode;
+            if (isEncrypt) {
+              shiftedCode =
+                ((charCode - "A".charCodeAt(0) + keyShift) % 26) +
+                "A".charCodeAt(0);
+            } else {
+              shiftedCode =
+                ((charCode - "A".charCodeAt(0) - keyShift + 26) % 26) +
+                "A".charCodeAt(0);
+            }
+            result += String.fromCharCode(shiftedCode);
+            keyIndex++;
+          } else if (char >= "a" && char <= "z") {
+            const keyShift =
+              cleanedKey.charCodeAt(keyIndex % cleanedKey.length) -
+              "A".charCodeAt(0);
+            let shiftedCode;
+            if (isEncrypt) {
+              shiftedCode =
+                ((charCode - "a".charCodeAt(0) + keyShift) % 26) +
+                "a".charCodeAt(0);
+            } else {
+              shiftedCode =
+                ((charCode - "a".charCodeAt(0) - keyShift + 26) % 26) +
+                "a".charCodeAt(0);
+            }
+            result += String.fromCharCode(shiftedCode);
+            keyIndex++;
+          } else {
+            result += char; // Non-alphabet characters pass through unchanged
+          }
+        }
+        return result;
+      }
+
+      // --- Event Listeners ---
+
+      // Load File Button
+      loadFileBtn.addEventListener("click", () => {
+        fileInput.click(); // Trigger the hidden file input click
+      });
+
+      fileInput.addEventListener("change", (event) => {
+        const file = event.target.files[0];
+        if (!file) {
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          inputTextarea.value = e.target.result;
+          clearError();
+          outputTextArea.value = ""; // Clear output after loading new input
+        };
+        reader.onerror = () => {
+          displayError("Error reading file: " + reader.error);
+        };
+        reader.readAsText(file);
+      });
+
+      // Process Button (Encrypt/Decrypt)
+      processBtn.addEventListener("click", () => {
+        clearError();
+        outputTextArea.value = ""; // Clear previous output
+
+        const text = inputTextarea.value;
+        const key = cipherKeyInput.value;
+        const isEncrypt = encryptRadio.checked;
+
+        if (!text.trim()) {
+          displayError("Please enter some text to process.");
+          return;
+        }
+        if (!key.trim()) {
+          displayError("Please enter a Cipher Key (Password).");
+          return;
+        }
+
+        try {
+          const result = vigenereProcess(text, key, isEncrypt);
+          outputTextArea.value = result;
+        } catch (error) {
+          displayError("Processing Error: " + error.message);
+        }
+      });
+
+      // Save File Button
+      saveFileBtn.addEventListener("click", () => {
+        const outputText = outputTextArea.value;
+        if (!outputText.trim()) {
+          displayError("No output text to save. Process some text first.");
+          return;
+        }
+
+        const blob = new Blob([outputText], {
+          type: "text/plain;charset=utf-8",
+        });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement("a");
+        a.href = url;
+        const fileName =
+          (encryptRadio.checked ? "encrypted_" : "decrypted_") +
+          Date.now() +
+          ".txt";
+        a.download = fileName;
+        document.body.appendChild(a); // Append to body to make it clickable
+        a.click(); // Programmatically click the link
+
+        // Clean up the temporary link and object URL
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        clearError(); // Clear any existing errors after successful save
+      });
+
+      // Clear errors/output when input changes (optional, for better UX)
+      inputTextarea.addEventListener("input", clearError);
+      cipherKeyInput.addEventListener("input", clearError);
+      encryptRadio.addEventListener("change", clearError);
+      decryptRadio.addEventListener("change", clearError);
+    </script>
+  </body>
+</html>

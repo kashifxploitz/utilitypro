@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Duplicate Remover | Multi-Tool Website</title>
+    <style>
+      :root {
+        --primary-blue: #4285f4;
+        --light-blue: #e8f0fe;
+        --white: #ffffff;
+        --light-gray: #f5f5f5;
+        --medium-gray: #e0e0e0;
+        --dark-gray: #5f6368;
+        --black: #202124;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+          "Helvetica Neue", sans-serif;
+      }
+
+      body {
+        background-color: var(--light-gray);
+        color: var(--black);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background-color: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .header {
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+
+      .tool {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      label {
+        font-weight: 500;
+        color: var(--dark-gray);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 150px;
+        padding: 15px;
+        border: 1px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+        transition: all 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 2px var(--light-blue);
+      }
+
+      .options {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 10px;
+      }
+
+      .option {
+        flex: 1;
+        min-width: 200px;
+      }
+
+      .option label {
+        display: block;
+        margin-bottom: 8px;
+      }
+
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+      }
+
+      select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 2px var(--light-blue);
+      }
+
+      .checkbox-group {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .checkbox-group input {
+        width: 18px;
+        height: 18px;
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex: 1;
+      }
+
+      button.primary {
+        background-color: var(--primary-blue);
+        color: var(--white);
+      }
+
+      button.primary:hover {
+        background-color: #3367d6;
+      }
+
+      button.secondary {
+        background-color: var(--light-gray);
+        color: var(--dark-gray);
+      }
+
+      button.secondary:hover {
+        background-color: #e0e0e0;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        color: var(--dark-gray);
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      .results {
+        margin-top: 20px;
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .options {
+          flex-direction: column;
+          gap: 15px;
+        }
+
+        .option {
+          min-width: 100%;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .header h1 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Duplicate Remover</h1>
+        <p>Easily remove duplicate lines or words from your text</p>
+      </div>
+
+      <div class="tool">
+        <div class="input-group">
+          <label for="input-text">Input Text</label>
+          <textarea
+            id="input-text"
+            placeholder="Paste your text with duplicates here..."
+          ></textarea>
+          <div class="stats">
+            <span id="original-lines">0 lines</span>
+            <span id="original-words">0 words</span>
+            <span id="original-chars">0 characters</span>
+          </div>
+        </div>
+
+        <div class="options">
+          <div class="option">
+            <label for="remove-type">Remove Duplicate:</label>
+            <select id="remove-type">
+              <option value="lines">Lines</option>
+              <option value="words">Words</option>
+            </select>
+          </div>
+          <div class="option">
+            <label for="sort-order">Sort Results:</label>
+            <select id="sort-order">
+              <option value="original">Keep original order</option>
+              <option value="alphabetical">Sort alphabetically</option>
+            </select>
+          </div>
+          <div class="option">
+            <label>Options:</label>
+            <div class="checkbox-group">
+              <input type="checkbox" id="case-sensitive" checked />
+              <label for="case-sensitive">Case sensitive</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="primary" onclick="removeDuplicates()">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Remove Duplicates
+          </button>
+          <button class="secondary" onclick="clearAll()">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              ></path>
+            </svg>
+            Clear All
+          </button>
+        </div>
+
+        <div class="results" id="results" style="display: none">
+          <div class="input-group">
+            <label for="output-text">Unique Results</label>
+            <textarea id="output-text" readonly></textarea>
+            <div class="stats">
+              <span id="unique-lines">0 unique lines</span>
+              <span id="unique-words">0 unique words</span>
+              <span id="unique-chars">0 characters</span>
+              <span id="removed-count">0 duplicates removed</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="primary" onclick="copyToClipboard()">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path
+                  d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                ></path>
+              </svg>
+              Copy Results
+            </button>
+            <button class="secondary" onclick="downloadText()">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const inputText = document.getElementById("input-text");
+      const outputText = document.getElementById("output-text");
+      const resultsDiv = document.getElementById("results");
+
+      // Update stats when input changes
+      inputText.addEventListener("input", updateStats);
+
+      function updateStats() {
+        const text = inputText.value;
+        const lines = text ? text.split("\n").length : 0;
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const chars = text.length;
+
+        document.getElementById("original-lines").textContent = `${lines} line${
+          lines !== 1 ? "s" : ""
+        }`;
+        document.getElementById("original-words").textContent = `${words} word${
+          words !== 1 ? "s" : ""
+        }`;
+        document.getElementById(
+          "original-chars"
+        ).textContent = `${chars} character${chars !== 1 ? "s" : ""}`;
+      }
+
+      function updateResultStats(text) {
+        const lines = text ? text.split("\n").length : 0;
+        const words = text.trim() ? text.trim().split(/\s+/).length : 0;
+        const chars = text.length;
+
+        document.getElementById(
+          "unique-lines"
+        ).textContent = `${lines} unique line${lines !== 1 ? "s" : ""}`;
+        document.getElementById("unique-words").textContent = `${words} word${
+          words !== 1 ? "s" : ""
+        }`;
+        document.getElementById(
+          "unique-chars"
+        ).textContent = `${chars} character${chars !== 1 ? "s" : ""}`;
+      }
+
+      function removeDuplicates() {
+        const text = inputText.value.trim();
+        if (!text) {
+          alert("Please enter some text first");
+          return;
+        }
+
+        const removeType = document.getElementById("remove-type").value;
+        const sortOrder = document.getElementById("sort-order").value;
+        const caseSensitive = document.getElementById("case-sensitive").checked;
+
+        let result;
+        let originalItems;
+        let uniqueItems;
+
+        if (removeType === "lines") {
+          originalItems = text.split("\n");
+          uniqueItems = removeDuplicatesFromArray(originalItems, caseSensitive);
+
+          if (sortOrder === "alphabetical") {
+            uniqueItems.sort((a, b) => {
+              const aCompare = caseSensitive ? a : a.toLowerCase();
+              const bCompare = caseSensitive ? b : b.toLowerCase();
+              return aCompare.localeCompare(bCompare);
+            });
+          }
+
+          result = uniqueItems.join("\n");
+        } else {
+          // words
+          originalItems = text.split(/\s+/);
+          uniqueItems = removeDuplicatesFromArray(originalItems, caseSensitive);
+
+          if (sortOrder === "alphabetical") {
+            uniqueItems.sort((a, b) => {
+              const aCompare = caseSensitive ? a : a.toLowerCase();
+              const bCompare = caseSensitive ? b : b.toLowerCase();
+              return aCompare.localeCompare(bCompare);
+            });
+          }
+
+          result = uniqueItems.join(" ");
+        }
+
+        outputText.value = result;
+        updateResultStats(result);
+
+        // Show removed count
+        const removed = originalItems.length - uniqueItems.length;
+        document.getElementById(
+          "removed-count"
+        ).textContent = `${removed} duplicate${
+          removed !== 1 ? "s" : ""
+        } removed`;
+
+        // Show results section
+        resultsDiv.style.display = "block";
+      }
+
+      function removeDuplicatesFromArray(arr, caseSensitive) {
+        const seen = {};
+        return arr.filter((item) => {
+          const key = caseSensitive ? item : item.toLowerCase();
+          if (!seen.hasOwnProperty(key)) {
+            seen[key] = true;
+            return true;
+          }
+          return false;
+        });
+      }
+
+      function copyToClipboard() {
+        if (!outputText.value) {
+          alert("No results to copy");
+          return;
+        }
+
+        outputText.select();
+        document.execCommand("copy");
+
+        // Show feedback
+        const copyBtn = document.querySelector("button.primary");
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Copied!
+            `;
+
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 2000);
+      }
+
+      function downloadText() {
+        const text = outputText.value;
+        if (!text) {
+          alert("No results to download");
+          return;
+        }
+
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "unique-text.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function clearAll() {
+        inputText.value = "";
+        outputText.value = "";
+        resultsDiv.style.display = "none";
+        updateStats();
+        inputText.focus();
+      }
+    </script>
+  </body>
+</html>

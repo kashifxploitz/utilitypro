@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>URL Encoder/Decoder | Multi-Tool Website</title>
+    <style>
+      :root {
+        --primary-blue: #4285f4;
+        --light-blue: #e8f0fe;
+        --white: #ffffff;
+        --light-gray: #f5f5f5;
+        --medium-gray: #e0e0e0;
+        --dark-gray: #5f6368;
+        --black: #202124;
+        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans",
+          "Helvetica Neue", sans-serif;
+      }
+
+      body {
+        background-color: var(--light-gray);
+        color: var(--black);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background-color: var(--white);
+        border-radius: 16px;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+      }
+
+      .header {
+        background-color: var(--primary-blue);
+        color: var(--white);
+        padding: 20px;
+        text-align: center;
+      }
+
+      .header h1 {
+        font-size: 1.8rem;
+        font-weight: 500;
+        margin-bottom: 5px;
+      }
+
+      .header p {
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+
+      .tool {
+        padding: 25px;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      label {
+        font-weight: 500;
+        color: var(--dark-gray);
+      }
+
+      textarea {
+        width: 100%;
+        min-height: 120px;
+        padding: 15px;
+        border: 1px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+        resize: vertical;
+        transition: all 0.3s ease;
+      }
+
+      textarea:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 2px var(--light-blue);
+      }
+
+      .mode-selector {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      .mode-option {
+        flex: 1;
+      }
+
+      .mode-option input {
+        display: none;
+      }
+
+      .mode-option label {
+        display: block;
+        padding: 12px;
+        background-color: var(--light-gray);
+        border-radius: 8px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+
+      .mode-option input:checked + label {
+        background-color: var(--primary-blue);
+        color: var(--white);
+      }
+
+      .action-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 10px;
+      }
+
+      button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        flex: 1;
+      }
+
+      button.primary {
+        background-color: var(--primary-blue);
+        color: var(--white);
+      }
+
+      button.primary:hover {
+        background-color: #3367d6;
+      }
+
+      button.secondary {
+        background-color: var(--light-gray);
+        color: var(--dark-gray);
+      }
+
+      button.secondary:hover {
+        background-color: #e0e0e0;
+      }
+
+      .stats {
+        display: flex;
+        justify-content: space-between;
+        color: var(--dark-gray);
+        font-size: 0.9rem;
+        margin-top: 5px;
+      }
+
+      .results {
+        margin-top: 20px;
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .mode-selector {
+          flex-direction: column;
+        }
+
+        .action-buttons {
+          flex-direction: column;
+        }
+
+        .header h1 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>URL Encoder/Decoder</h1>
+        <p>Encode or decode URLs for web use (percent-encoding)</p>
+      </div>
+
+      <div class="tool">
+        <div class="input-group">
+          <label for="input-text">Input URL or Text</label>
+          <textarea
+            id="input-text"
+            placeholder="Enter the URL or text you want to encode or decode..."
+          ></textarea>
+          <div class="stats">
+            <span id="char-count">0 characters</span>
+          </div>
+        </div>
+
+        <div class="mode-selector">
+          <div class="mode-option">
+            <input
+              type="radio"
+              id="encode"
+              name="mode"
+              value="encode"
+              checked
+            />
+            <label for="encode">Encode</label>
+          </div>
+          <div class="mode-option">
+            <input type="radio" id="decode" name="mode" value="decode" />
+            <label for="decode">Decode</label>
+          </div>
+        </div>
+
+        <div class="action-buttons">
+          <button class="primary" onclick="processText()">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+              <polyline points="7 10 12 15 17 10"></polyline>
+              <line x1="12" y1="15" x2="12" y2="3"></line>
+            </svg>
+            Process
+          </button>
+          <button class="secondary" onclick="clearAll()">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <path
+                d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+              ></path>
+            </svg>
+            Clear All
+          </button>
+        </div>
+
+        <div class="results" id="results" style="display: none">
+          <div class="input-group">
+            <label for="output-text">Result</label>
+            <textarea id="output-text" readonly></textarea>
+            <div class="stats">
+              <span id="output-char-count">0 characters</span>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="primary" onclick="copyToClipboard()">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path
+                  d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"
+                ></path>
+              </svg>
+              Copy to Clipboard
+            </button>
+            <button class="secondary" onclick="downloadResult()">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                <polyline points="7 10 12 15 17 10"></polyline>
+                <line x1="12" y1="15" x2="12" y2="3"></line>
+              </svg>
+              Download
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // DOM elements
+      const inputText = document.getElementById("input-text");
+      const outputText = document.getElementById("output-text");
+      const resultsDiv = document.getElementById("results");
+      const charCount = document.getElementById("char-count");
+      const outputCharCount = document.getElementById("output-char-count");
+
+      // Update character count when input changes
+      inputText.addEventListener("input", function () {
+        const count = inputText.value.length;
+        charCount.textContent = `${count} character${count !== 1 ? "s" : ""}`;
+      });
+
+      function processText() {
+        const text = inputText.value.trim();
+        if (!text) {
+          alert("Please enter some text first");
+          return;
+        }
+
+        const mode = document.querySelector('input[name="mode"]:checked').value;
+        let result;
+
+        if (mode === "encode") {
+          result = encodeURIComponent(text);
+        } else {
+          try {
+            result = decodeURIComponent(text);
+          } catch (e) {
+            alert(
+              "Error decoding URL: The input contains invalid percent-encoded sequences"
+            );
+            return;
+          }
+        }
+
+        outputText.value = result;
+
+        // Update output stats
+        const count = result.length;
+        outputCharCount.textContent = `${count} character${
+          count !== 1 ? "s" : ""
+        }`;
+
+        // Show results
+        resultsDiv.style.display = "block";
+      }
+
+      function copyToClipboard() {
+        if (!outputText.value) {
+          alert("No result to copy");
+          return;
+        }
+
+        outputText.select();
+        document.execCommand("copy");
+
+        // Show feedback
+        const copyBtn = document.querySelector(".action-buttons .primary");
+        const originalText = copyBtn.innerHTML;
+        copyBtn.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                </svg>
+                Copied!
+            `;
+
+        setTimeout(() => {
+          copyBtn.innerHTML = originalText;
+        }, 2000);
+      }
+
+      function downloadResult() {
+        const text = outputText.value;
+        if (!text) {
+          alert("No result to download");
+          return;
+        }
+
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "url-result.txt";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }
+
+      function clearAll() {
+        inputText.value = "";
+        outputText.value = "";
+        resultsDiv.style.display = "none";
+        charCount.textContent = "0 characters";
+        inputText.focus();
+      }
+
+      // Handle Enter key in input
+      inputText.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" && e.ctrlKey) {
+          processText();
+        }
+      });
+    </script>
+  </body>
+</html>
